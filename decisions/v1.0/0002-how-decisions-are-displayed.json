@@ -1,0 +1,131 @@
+{
+  "id": "d2",
+  "title": "How decisions are displayed",
+  "category": "Visualization",
+  "version": "1.0",
+  "phase": "Design",
+  "type": "technical",
+  "question": "How should the saved decisions be shown on screen?",
+  "status": "decided",
+  "dependsOn": [
+    "d1"
+  ],
+  "rationale": "Decisions show as a stage-grouped card grid; clicking one opens it in a focused pop-up. Chosen because it keeps the scan-by-stage review goal but looks designed, where the earlier two-pane list read as plain and the node-graph/3D views drifted from reviewing.",
+  "history": [
+    {
+      "from": "Interactive knowledge graph (HTML)",
+      "reason": "The web-of-nodes and 3D views were good for analysis and looked impressive, but got away from the goal of reviewing past decisions. Switched to a grouped review list."
+    },
+    {
+      "from": "Grouped review log (offline HTML)",
+      "reason": "The grouped list showed every decision in full at once and felt text-heavy and overwhelming. Switched to a list-plus-panel view that shows one decision at a time."
+    },
+    {
+      "from": "List plus detail panel (one decision at a time)",
+      "reason": "The two-pane list-and-panel read as plain and dated — too close to the original. Switched to an apple.com-style card grid with a focused pop-up per decision, same review goal, more designed.",
+      "date": "2026-06-20T19:36:42"
+    }
+  ],
+  "options": [
+    {
+      "id": "o2a",
+      "label": "Connected web of nodes (interactive graph)",
+      "chosen": false,
+      "tradeoffs": [
+        {
+          "criterion": "shows connections",
+          "sentiment": "+",
+          "note": "shared tradeoffs visibly link decisions"
+        },
+        {
+          "criterion": "build effort",
+          "sentiment": "~",
+          "note": "one script to build the page"
+        }
+      ]
+    },
+    {
+      "id": "o2b",
+      "label": "Simple branching tree (Mermaid)",
+      "chosen": false,
+      "tradeoffs": [
+        {
+          "criterion": "shows connections",
+          "sentiment": "-",
+          "note": "strict tree; each item can have only one parent"
+        },
+        {
+          "criterion": "build effort",
+          "sentiment": "+",
+          "note": "very easy to produce"
+        }
+      ]
+    },
+    {
+      "id": "o2c",
+      "label": "Grouped review list",
+      "chosen": false,
+      "tradeoffs": [
+        {
+          "criterion": "shows connections",
+          "sentiment": "-",
+          "note": "doesn't picture how decisions link together"
+        },
+        {
+          "criterion": "build effort",
+          "sentiment": "+",
+          "note": "plain web page, no outside software, works offline"
+        },
+        {
+          "criterion": "fits review goal",
+          "sentiment": "~",
+          "note": "browse by topic, but shows every decision in full at once"
+        }
+      ]
+    },
+    {
+      "id": "o2d",
+      "label": "List plus detail panel (one decision at a time)",
+      "chosen": false,
+      "tradeoffs": [
+        {
+          "criterion": "fits review goal",
+          "sentiment": "+",
+          "note": "left: short list; right: full text of the one you pick"
+        },
+        {
+          "criterion": "build effort",
+          "sentiment": "+",
+          "note": "plain offline web page, no outside software"
+        },
+        {
+          "criterion": "looks designed",
+          "sentiment": "-",
+          "note": "plain two-pane; read as dated, too close to the original"
+        }
+      ]
+    },
+    {
+      "id": "o2e",
+      "label": "Card grid + focused pop-up (apple.com-style)",
+      "chosen": true,
+      "tradeoffs": [
+        {
+          "criterion": "fits review goal",
+          "sentiment": "+",
+          "note": "scan cards by stage, then open one decision in a focused pop-up"
+        },
+        {
+          "criterion": "looks designed",
+          "sentiment": "+",
+          "note": "big type, whitespace, cards in a grid — feels like a real product page"
+        },
+        {
+          "criterion": "build effort",
+          "sentiment": "+",
+          "note": "still a plain offline page, opens by double-clicking"
+        }
+      ]
+    }
+  ]
+}

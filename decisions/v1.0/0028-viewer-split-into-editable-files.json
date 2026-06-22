@@ -1,0 +1,103 @@
+{
+  "id": "d28",
+  "title": "Viewer split into editable files",
+  "category": "Architecture",
+  "phase": "Implementation",
+  "type": "technical",
+  "date": "2026-06-20T19:21:07",
+  "version": "1.0",
+  "question": "Should the viewer stay one big generated file, or split into separate HTML/CSS/JS that read the decision data?",
+  "status": "decided",
+  "dependsOn": [
+    "d1",
+    "d2",
+    "d8",
+    "d27"
+  ],
+  "rationale": "Split the viewer into editable index.html / styles.css / app.js, and have app.js read the decision JSON directly via a tiny manifest — so editing a decision and refreshing just works, no rebuild or duplicated data. The trade-off: the folder must be served over http, since double-click can't fetch neighbor files.",
+  "options": [
+    {
+      "id": "o28c",
+      "label": "Separate files that read the JSON directly (local server)",
+      "chosen": true,
+      "tradeoffs": [
+        {
+          "criterion": "editing & comparing",
+          "sentiment": "+",
+          "note": "restyle in plain CSS; edit a decision's JSON and refresh, no rebuild"
+        },
+        {
+          "criterion": "no duplicated data",
+          "sentiment": "+",
+          "note": "the page reads each decision file; nothing copies the content"
+        },
+        {
+          "criterion": "works offline",
+          "sentiment": "~",
+          "note": "still offline, but the folder must be served locally (python3 -m http.server)"
+        },
+        {
+          "criterion": "manual effort",
+          "sentiment": "~",
+          "note": "start a small local server to view; no rebuild for content edits"
+        }
+      ]
+    },
+    {
+      "id": "o28a",
+      "label": "Separate index.html / styles.css / app.js + generated data.js",
+      "chosen": false,
+      "tradeoffs": [
+        {
+          "criterion": "editing & comparing",
+          "sentiment": "+",
+          "note": "restyle in plain CSS; no Python, no regenerating the look"
+        },
+        {
+          "criterion": "works offline",
+          "sentiment": "+",
+          "note": "data is a script include, so double-click still works with no server"
+        },
+        {
+          "criterion": "no duplicated data",
+          "sentiment": "-",
+          "note": "data.js holds a baked copy of every decision, separate from the JSON"
+        }
+      ]
+    },
+    {
+      "id": "o28b",
+      "label": "Keep the single generated file (leave as is)",
+      "chosen": false,
+      "tradeoffs": [
+        {
+          "criterion": "editing & comparing",
+          "sentiment": "-",
+          "note": "styling is buried in the Python; every change regenerates the whole file"
+        },
+        {
+          "criterion": "build effort",
+          "sentiment": "+",
+          "note": "already built, nothing to change"
+        }
+      ]
+    }
+  ],
+  "history": [
+    {
+      "from": "Separate files + generated data.js (data baked into a script include)",
+      "reason": "Switched to reading the JSON files directly so there's no duplicated copy of the decision data; the page now fetches a filename manifest and loads each decision file live. Trade-off: the folder must be served locally (http) instead of opened by double-click.",
+      "date": "2026-06-20T19:55:04"
+    },
+    {
+      "from": "Generator templates held the original viewer (translucent top bar, basic toolbar)",
+      "reason": "Promoted the refined viewer into the generator's embedded templates so new projects scaffold it by default — no top bar (floating theme/help), hero app-icon lockup, full-width search with a Sort · Filter · View cluster, and an icon view toggle. Scaffold-only-if-missing is unchanged, so existing projects keep their hand-edited files and are updated by copying the newer ones in.",
+      "date": "2026-06-20T20:35:01"
+    },
+    {
+      "from": "Each project kept its own scaffolded copy of index.html / styles.css / app.js (scaffold-only-if-missing); viewer updates had to be copied into each project by hand",
+      "reason": "Made the viewer ONE shared template — each project now symlinks to a single canonical copy, so editing it once updates every project automatically and only the decision data stays per-project (see d35). The split-file, read-JSON-live model is unchanged; what changed is per-project copies → one shared, self-healing link.",
+      "date": "2026-06-22T11:33:30"
+    }
+  ]
+}

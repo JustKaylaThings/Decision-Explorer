@@ -1,0 +1,110 @@
+{
+  "id": "d5",
+  "title": "Showing links between decisions",
+  "category": "Visualization",
+  "version": "1.0",
+  "phase": "Design",
+  "type": "technical",
+  "question": "How should the way one decision connects to another be shown?",
+  "status": "decided",
+  "dependsOn": [
+    "d2"
+  ],
+  "rationale": "Show links inline in each decision's detail panel, not a separate map. 'Affects' is a loop-safe, collapsible tree: direct dependents show by default, each parent expands to its subtree with a descendant count, so a deep impact stays scannable. 'Depends on' stays one hop.",
+  "history": [
+    {
+      "from": "Both",
+      "reason": "The list-plus-panel viewer (d2) removed the map tab; connections now show as 'depends on' and 'affects' rows in the detail panel, so they're shown inline only."
+    },
+    {
+      "from": "Inline links showed only immediate neighbors",
+      "reason": "The cascade job — seeing what revisiting a decision threatens — needs the full downstream chain, not just one hop. Extended 'Affects' to walk transitively (downstream only), kept it inline with no separate map.",
+      "date": "2026-06-20T16:14:05"
+    },
+    {
+      "from": "'Affects' shown as a flat, fully-expanded indented list of the whole downstream cascade",
+      "reason": "The full cascade (30+ rows for big decisions like d1/d2) was a wall of indented rows. Made 'Affects' a collapsible tree — only direct dependents show, each parent expandable with a +N descendant count — so deep impact stays scannable; also fixed a bug that rendered multi-path nodes twice.",
+      "date": "2026-06-20T21:24:46"
+    }
+  ],
+  "options": [
+    {
+      "id": "o5a",
+      "label": "Inline links, with transitive downstream impact",
+      "chosen": true,
+      "tradeoffs": [
+        {
+          "criterion": "fits review goal",
+          "sentiment": "+",
+          "note": "jump between linked decisions without leaving the list"
+        },
+        {
+          "criterion": "answers the cascade job",
+          "sentiment": "+",
+          "note": "'Affects' walks several hops, so you see everything a decision threatens"
+        },
+        {
+          "criterion": "whole-picture view",
+          "sentiment": "~",
+          "note": "deep chains can get long; mitigated by downstream-only and collapsing"
+        }
+      ]
+    },
+    {
+      "id": "o5b",
+      "label": "Optional connections map",
+      "chosen": false,
+      "tradeoffs": [
+        {
+          "criterion": "whole-picture view",
+          "sentiment": "+",
+          "note": "see every connection at once"
+        },
+        {
+          "criterion": "build effort",
+          "sentiment": "~",
+          "note": "a second map view to build"
+        }
+      ]
+    },
+    {
+      "id": "o5c",
+      "label": "Both",
+      "chosen": false,
+      "tradeoffs": [
+        {
+          "criterion": "fits review goal",
+          "sentiment": "+",
+          "note": "inline links keep reviewing front and center"
+        },
+        {
+          "criterion": "whole-picture view",
+          "sentiment": "+",
+          "note": "a map for the full web"
+        },
+        {
+          "criterion": "build effort",
+          "sentiment": "-",
+          "note": "two things to build"
+        }
+      ]
+    },
+    {
+      "id": "o5d",
+      "label": "Just save the links, show them later",
+      "chosen": false,
+      "tradeoffs": [
+        {
+          "criterion": "build effort",
+          "sentiment": "+",
+          "note": "display can come later"
+        },
+        {
+          "criterion": "whole-picture view",
+          "sentiment": "-",
+          "note": "nothing visible yet"
+        }
+      ]
+    }
+  ]
+}
