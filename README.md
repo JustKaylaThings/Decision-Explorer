@@ -204,3 +204,9 @@ cp ~/.claude/skills/decision-tree/viewer/*      skill/viewer/
 
 - [Claude Code](https://claude.com/claude-code)
 - Python 3 (standard library only — no `pip install`)
+
+## Inspiration
+
+This project was inspired by Alan Knox's book **[AI Builders](https://amzn.to/3SodJoj)** — its ideas
+about building with AI shaped the approach behind Decision Explorer. You can also find Alan on
+[LinkedIn](https://www.linkedin.com/in/alanknox/).
