@@ -65,6 +65,12 @@ The argument after `/decision-tree` selects the action. With no argument, infer 
      decision is made for a specific release you're cutting. Leave it off when the decision doesn't map
      to one release. The viewer shows it as a `v…` tag and offers "By version" grouping + a filter once
      any decision carries one (d36). Reuse existing version strings verbatim.
+   - optional **built** — set `"built": false` for a decision whose choice is made but **not yet built
+     into the app** (the gap between deciding and shipping). Leave it off (or `true`) once the work is
+     done. The viewer pins a "Not built yet" group above the list, adds a "Not built yet only" filter,
+     and tags the decision — all of which stay invisible while nothing is unbuilt (d43). It's separate
+     from `status`: a decided-but-unbuilt decision is still `decided`, not `open`. When the user later
+     says a decision is built/shipped, drop the flag and regenerate.
 2. Write a new file containing the decision object, with a fresh `id` (`d<N>`, where `N` is the next
    number across ALL folders) and matching `NNNN` (zero-padded `N`); option ids `o<N><a..>`. `slug`
    is the kebab-case title. Place it in `decisions/v<version>/NNNN-slug.json` when the decision has a
@@ -218,6 +224,7 @@ Each `decisions/NNNN-slug.json` is a single decision object (no wrapper array):
       "type": "technical | general",
       "question": "string",
       "status": "decided | open",
+      "built": "boolean (optional; false = decided but not yet built into the app, d43)",
       "rationale": "string",
       "dependsOn": ["d0"],
       "history": [{ "from": "string", "reason": "string", "date": "YYYY-MM-DDThh:mm:ss" }],

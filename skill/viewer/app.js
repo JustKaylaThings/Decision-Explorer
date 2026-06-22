@@ -69,6 +69,7 @@ let activeId = null;          // the decision shown in the open sheet, or null
 let sortMode = 'recent';      // default view: newest-activity first (the "what changed lately" question)
 let filter = '';
 let openOnly = false;
+let builtOnly = false;        // isolate just the decided-but-not-built decisions (d43)
 let areaFilter = '';
 let verFilter = '';           // selected app version; '' = all
 let catFilter = new Set();    // selected categories (multi-select); empty = all
@@ -76,6 +77,10 @@ let collapsed = new Set();    // section names folded shut in the list (persists
 let viewMode = (function(){ try { return localStorage.getItem('dt-view')==='list' ? 'list' : 'cards'; } catch(e){ return 'cards'; } })();
 
 const isOpen = d => d.status === 'open';
+// Decided but not yet built into the app: an optional flag, kept separate from open/decided so a
+// decided decision can still be marked unshipped (d43). Absent or true → built; only built===false
+// marks it unbuilt, so the surfaces below stay dormant for projects that never set it.
+const isUnbuilt = d => d.built === false;
 const passes = d => matches(d, filter)
   && (!areaFilter || areaOf(d) === areaFilter)
   && (!verFilter || versionOf(d) === verFilter)
@@ -97,12 +102,14 @@ function setHeader(){
   const revisions = RAW.reduce((n, d) => n + ((d.history || []).length), 0);
   const made = logged + revisions;
   const openN = RAW.filter(isOpen).length;
+  const unbuiltN = RAW.filter(isUnbuilt).length;
   const hs = document.getElementById('heroSub');
   if (!hs) return;
   if (!logged){ hs.textContent = 'No decisions logged yet'; return; }
   const parts = [logged + ' logged'];
   if (revisions) parts.push(revisions + ' revision' + (revisions===1?'':'s'));
   if (openN) parts.push(openN + ' open');
+  if (unbuiltN) parts.push(unbuiltN + ' not built');
   hs.innerHTML = `<span class="hero-count">${made} decision${made===1?'':'s'} made</span><span class="hero-break">${parts.join(' · ')}</span>`;
 }
 
@@ -114,8 +121,9 @@ function cardHTML(d, opts){
   opts = opts || {};
   const p = phaseOf(d), ch = chosenOf(d), pc = phaseColor(p);
   const rev = (!opts.hideRev && d.history && d.history.length) ? '<span class="card-rev">revised</span>' : '';
+  const build = isUnbuilt(d) ? '<span class="card-build">Not built yet</span>' : '';
   const shown = ('date' in opts) ? opts.date : lastActivity(d);
-  return `<article class="dt-item card${isOpen(d)?' is-open':''}" data-id="${esc(d.id)}" tabindex="0">
+  return `<article class="dt-item card${isOpen(d)?' is-open':''}${isUnbuilt(d)?' is-unbuilt':''}" data-id="${esc(d.id)}" tabindex="0">
     <div class="card-head">
       <span class="phase-pill" style="color:${pc};background:${pc}22">${esc(p)}</span>
       <span class="card-id">${esc(d.id)}</span>
@@ -124,22 +132,23 @@ function cardHTML(d, opts){
     <h3 class="card-title">${esc(d.title)}</h3>
     <div class="card-chosen${ch?'':' open'}">${ch?'✓ '+esc(ch.label):'Open — undecided'}</div>
     ${d.rationale?`<p class="card-why">${esc(d.rationale)}</p>`:''}
-    <div class="card-foot">${d.category?`<span class="card-cat">${esc(d.category)}</span>`:''}${versionOf(d)?`<span class="card-ver">v${esc(versionOf(d))}</span>`:''}${rev}</div>
+    <div class="card-foot">${build}${d.category?`<span class="card-cat">${esc(d.category)}</span>`:''}${versionOf(d)?`<span class="card-ver">v${esc(versionOf(d))}</span>`:''}${rev}</div>
   </article>`;
 }
 function rowHTML(d, opts){
   opts = opts || {};
   const p = phaseOf(d), ch = chosenOf(d), pc = phaseColor(p);
   const rev = (!opts.hideRev && d.history && d.history.length) ? '<span class="row-rev">revised</span>' : '';
+  const build = isUnbuilt(d) ? '<span class="row-build">Not built</span>' : '';
   const shown = ('date' in opts) ? opts.date : lastActivity(d);
-  return `<div class="dt-item row${isOpen(d)?' is-open':''}" data-id="${esc(d.id)}" tabindex="0">
+  return `<div class="dt-item row${isOpen(d)?' is-open':''}${isUnbuilt(d)?' is-unbuilt':''}" data-id="${esc(d.id)}" tabindex="0">
     <span class="row-dot" style="background:${pc}"></span>
     <span class="row-id">${esc(d.id)}</span>
     <div class="row-main">
       <span class="row-title">${esc(d.title)}</span>
       <span class="row-chosen${ch?'':' open'}">${ch?'✓ '+esc(ch.label):'Open — undecided'}</span>
     </div>
-    ${d.category?`<span class="row-cat">${esc(d.category)}</span>`:''}${versionOf(d)?`<span class="row-ver">v${esc(versionOf(d))}</span>`:''}${rev}
+    ${build}${d.category?`<span class="row-cat">${esc(d.category)}</span>`:''}${versionOf(d)?`<span class="row-ver">v${esc(versionOf(d))}</span>`:''}${rev}
     ${shown?`<span class="row-date">${cardDate(shown,opts.time)}</span>`:''}
     <span class="row-arrow">›</span>
   </div>`;
@@ -193,7 +202,7 @@ function revTimeline(d){
 function sectionWrap(name, color, innerCards, count, pinned){
   const isCol = collapsed.has(name);
   const inner = viewMode === 'list' ? `<div class="dlist">${innerCards}</div>` : `<div class="grid">${innerCards}</div>`;
-  return `<section class="phase-sec${pinned?' pinned':''}${isCol?' collapsed':''}">
+  return `<section class="phase-sec${pinned?' '+pinned:''}${isCol?' collapsed':''}">
     <header class="sec-head" data-sec="${esc(name)}" role="button" tabindex="0" aria-expanded="${isCol?'false':'true'}">
       <span class="sec-caret" aria-hidden="true">▾</span><span class="sec-dot" style="background:${color}"></span>
       <h2 class="sec-name">${esc(name)} (${count})</h2></header>
@@ -210,10 +219,13 @@ function toggleSection(name){ collapsed.has(name) ? collapsed.delete(name) : col
 function renderFilters(){
   const pop = document.getElementById('filterPop');
   const openN = RAW.filter(isOpen).length;
+  const unbuiltN = RAW.filter(isUnbuilt).length;
   let h = '';
-  if (openN){
-    h += `<div class="fp-sec"><div class="fp-h">Show</div>
-      <button class="fp-opt${openOnly?' on':''}" data-toggle="open"><span class="fp-check">✓</span>Open decisions only<span class="fp-n">${openN}</span></button></div>`;
+  if (openN || unbuiltN){
+    h += `<div class="fp-sec"><div class="fp-h">Show</div>`;
+    if (openN) h += `<button class="fp-opt${openOnly?' on':''}" data-toggle="open"><span class="fp-check">✓</span>Open decisions only<span class="fp-n">${openN}</span></button>`;
+    if (unbuiltN) h += `<button class="fp-opt${builtOnly?' on':''}" data-toggle="built"><span class="fp-check">✓</span>Not built yet only<span class="fp-n">${unbuiltN}</span></button>`;
+    h += `</div>`;
   }
   if (AXIS){
     const vals = [...new Set(RAW.map(areaOf).filter(Boolean))].sort();
@@ -243,7 +255,7 @@ function renderFilters(){
         }).join('')
       + `</div>`;
   }
-  const active = (openOnly?1:0) + (areaFilter?1:0) + (verFilter?1:0) + catFilter.size;
+  const active = (openOnly?1:0) + (builtOnly?1:0) + (areaFilter?1:0) + (verFilter?1:0) + catFilter.size;
   pop.innerHTML = h || '<div class="fp-sec"><div class="fp-h">No filters available</div></div>';
   const foot = document.getElementById('filterFoot');      // pinned footer: always visible, never scrolls away
   if (foot){
@@ -261,15 +273,28 @@ function buildList(){
   renderFilters();
   if (!RAW.length){ root.innerHTML = '<div class="empty-state">No decisions logged yet.<br>Use <code>/decision-tree add</code>.</div>'; return; }
 
-  if (openOnly){
-    const items = RAW.filter(d => isOpen(d) && passes(d)).sort(byRecency);
-    root.innerHTML = items.length ? sectionHTML('Needs deciding', 'var(--neg)', items, true)
-      : '<div class="empty-state">No open decisions'+(filter?' match “'+esc(filter)+'”':'')+'.</div>';
+  // Isolation mode: "open only" and/or "not built only" collapse the list to just those groups.
+  if (openOnly || builtOnly){
+    let only = '';
+    if (openOnly){
+      const items = RAW.filter(d => isOpen(d) && passes(d)).sort(byRecency);
+      if (items.length) only += sectionHTML('Needs deciding', 'var(--neg)', items, 'pinned');
+    }
+    if (builtOnly){
+      const items = RAW.filter(d => isUnbuilt(d) && passes(d)).sort(byRecency);
+      if (items.length) only += sectionHTML('Not built yet', 'var(--build)', items, 'pinned pinned-build');
+    }
+    const labels = [openOnly?'open':'', builtOnly?'unbuilt':''].filter(Boolean).join(' or ');
+    root.innerHTML = only || '<div class="empty-state">No '+labels+' decisions'+(filter?' match “'+esc(filter)+'”':'')+'.</div>';
     return;
   }
 
-  const pinned = RAW.filter(d => isOpen(d) && passes(d));
-  let html = pinned.length ? sectionHTML('Needs deciding', 'var(--neg)', pinned, true) : '';
+  // Pinned groups sit above the framework so what's unresolved (open, d13) or decided-but-unshipped
+  // (unbuilt, d43) is always in view; each hides when its group is empty.
+  const pinnedOpen = RAW.filter(d => isOpen(d) && passes(d));
+  const pinnedUnbuilt = RAW.filter(d => isUnbuilt(d) && passes(d));
+  let html = (pinnedOpen.length ? sectionHTML('Needs deciding', 'var(--neg)', pinnedOpen, 'pinned') : '')
+           + (pinnedUnbuilt.length ? sectionHTML('Not built yet', 'var(--build)', pinnedUnbuilt, 'pinned pinned-build') : '');
   let body = '';
 
   if (sortMode === 'recent'){
@@ -401,14 +426,16 @@ function sheetHTML(d){
     <span class="d-id">${esc(d.id)}</span>
     ${meta}
     ${d.status==='open'?'<span class="tag open">open</span>':''}
+    ${d.built===false?'<span class="tag unbuilt">not built yet</span>':''}
     ${revised?'<span class="tag revised" data-open-fold="history">revised</span>':''}</div>`;
   h += `<h2 class="d-title">${esc(d.title)}</h2>`;
   if (d.question) h += `<p class="d-question">${esc(d.question)}</p>`;
-  h += `<div class="answer${ch?'':' open'}">
+  h += `<div class="answer${ch?'':' open'}${ch&&d.built===false?' unbuilt':''}">
     <span class="answer-mark">${ch?'✓':'!'}</span>
     <div>
-      <div class="answer-cap">${ch?'Chosen':'Status'}</div>
+      <div class="answer-cap">${ch?(d.built===false?'Chosen · not built yet':'Chosen'):'Status'}</div>
       <div class="answer-val">${ch?esc(ch.label):'Still open — no option chosen yet'}</div>
+      ${ch&&d.built===false?'<div class="answer-build">Decided, but not yet built into the app.</div>':''}
     </div></div>`;
   if (d.rationale)
     h += `<section class="block"><div class="eyebrow">Why</div><p class="why-text">${esc(d.rationale)}</p></section>`;
@@ -500,13 +527,14 @@ filterDrawer.addEventListener('click', e => {
   const opt = e.target.closest('.fp-opt');
   if (opt){
     if (opt.dataset.toggle === 'open') openOnly = !openOnly;
+    else if (opt.dataset.toggle === 'built') builtOnly = !builtOnly;
     else if (opt.hasAttribute('data-area')) areaFilter = opt.dataset.area;
     else if (opt.hasAttribute('data-ver')) verFilter = opt.dataset.ver;
     else if (opt.hasAttribute('data-cat')){ const c = opt.dataset.cat; catFilter.has(c) ? catFilter.delete(c) : catFilter.add(c); }
     buildList();  // re-renders the drawer (renderFilters) so checks/badge update; stays open
     return;
   }
-  if (e.target.closest('#clearFilters')){ openOnly = false; areaFilter = ''; verFilter = ''; catFilter.clear(); buildList(); }
+  if (e.target.closest('#clearFilters')){ openOnly = false; builtOnly = false; areaFilter = ''; verFilter = ''; catFilter.clear(); buildList(); }
 });
 // Sort dropdown: a single button that opens a popover menu of grouping modes (d30 revised).
 // The mode list is dynamic — "By <axis>" and "By version" appear only when they apply.
