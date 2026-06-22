@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Decision Explorer</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  /* set the theme before paint so there's no flash */
+  (function(){
+    try {
+      var t = localStorage.getItem('dt-theme');
+      if (t !== 'light' && t !== 'dark')
+        t = (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch(e) { document.documentElement.setAttribute('data-theme', 'dark'); }
+  })();
+</script>
+</head>
+<body>
+<div class="topbtns">
+  <button class="iconbtn" id="theme" title="Toggle light/dark">&#9728;</button>
+  <button class="iconbtn" id="help" title="Keyboard shortcuts (Cmd+?)">?</button>
+</div>
+<main>
+  <section class="hero">
+    <div class="hero-name">
+      <img class="app-icon hero-icon" alt="" hidden>
+      <h1 id="heroTitle">Decisions</h1>
+    </div>
+    <p class="hero-sub" id="heroSub"></p>
+  </section>
+  <div class="toolbar" id="toolbar">
+    <div class="tb-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="16.5" y1="16.5" x2="21" y2="21"></line></svg>
+      <input id="search" type="search" placeholder="Search decisions">
+    </div>
+    <div class="tb-right">
+      <div class="sort-wrap" id="sortWrap">
+        <button class="sort-btn" id="sortBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Sort decisions">
+          <span class="seg-lbl">Sort</span>
+          <span class="sort-cur" id="sortCur">Recent</span>
+          <svg class="sort-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="sort-menu" id="sortMenu" role="listbox"></div>
+      </div>
+      <div class="filter-wrap">
+        <button class="filter-btn" id="filterBtn" title="Filter" aria-haspopup="dialog" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="7" y1="12" x2="17" y2="12"></line><line x1="10" y1="17" x2="14" y2="17"></line></svg>
+          Filter<span class="filter-badge" id="filterBadge"></span>
+        </button>
+      </div>
+      <div class="seg" id="viewSeg" role="group" aria-label="View as">
+        <span class="seg-lbl">View</span>
+        <button class="tab tab-icon active" data-view="cards" title="Card grid" aria-label="Card grid">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>
+        </button>
+        <button class="tab tab-icon" data-view="list" title="Compact list" aria-label="Compact list">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><circle cx="3.5" cy="6" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="3.5" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="3.5" cy="18" r="1.2" fill="currentColor" stroke="none"></circle></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="list"></div>
+</main>
+<div id="filterDrawer" class="drawer" role="dialog" aria-modal="true" aria-label="Filter decisions">
+  <aside class="drawer-card">
+    <header class="drawer-head">
+      <h2 class="drawer-title">Filter</h2>
+      <button class="drawer-close" id="filterClose" aria-label="Close">&#10005;</button>
+    </header>
+    <div class="filter-pop" id="filterPop"></div>
+    <div class="drawer-foot" id="filterFoot" hidden>
+      <button class="fp-clear" id="clearFilters">Clear filters</button>
+    </div>
+  </aside>
+</div>
+<div id="sheet" class="sheet"><div class="sheet-card" id="sheetBody"></div></div>
+<div id="kbhelp" class="kbhelp">
+  <div class="kbhelp-card">
+    <div class="kbhelp-h">Keyboard</div>
+    <div class="kbrow"><kbd>/</kbd><span>search</span></div>
+    <div class="kbrow"><kbd>Enter</kbd><span>open the top result</span></div>
+    <div class="kbrow"><kbd>&larr;</kbd><kbd>&rarr;</kbd><span>prev / next decision (in a sheet)</span></div>
+    <div class="kbrow"><kbd>Esc</kbd><span>close</span></div>
+    <div class="kbrow"><kbd>Cmd+?</kbd><span>this help</span></div>
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

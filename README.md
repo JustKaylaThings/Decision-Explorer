@@ -1,0 +1,96 @@
+# Decision Tree
+
+A [Claude Code](https://claude.com/claude-code) skill that captures the **decisions** behind a
+project — each with the options you weighed, their tradeoffs, what you chose and why — and renders
+them as an interactive, offline **decision explorer** you open in any browser.
+
+You log decisions in plain conversation ("`/decision-tree add ...`"); the skill writes one small
+JSON file per decision and regenerates the viewer. The explorer lets you browse by recency, by SDLC
+phase, by release version, search, and open any decision to see the chosen option, the full
+options × tradeoffs comparison, and a timeline of how it changed over time.
+
+No build step, no dependencies beyond **Python 3** — the viewer is plain HTML/CSS/JS and works fully
+offline.
+
+## What's in this repo
+
+```
+skill/                     the installable skill
+├── SKILL.md               how the skill behaves (Claude reads this)
+├── generate.py            builds the viewer from the decision files
+├── consulting.md          the "plan" flow (weigh a change against past decisions)
+├── auditing.md            the "audit" flow (back-fill decisions from an existing codebase)
+├── viewer/                the decision explorer (app.js, styles.css, index.html)
+├── hooks/                 reconcile-decisions.py — optional Stop-hook backstop
+└── settings.example.json  hook wiring to merge into a project's .claude/settings.json
+decisions/                 this project's own decision log — a live example (open it in the viewer)
+```
+
+## Install (once)
+
+Copy the skill into your personal Claude Code skills folder:
+
+```sh
+mkdir -p ~/.claude/skills/decision-tree
+cp -R skill/SKILL.md skill/generate.py skill/consulting.md skill/auditing.md skill/viewer \
+      ~/.claude/skills/decision-tree/
+```
+
+That's it — `/decision-tree` is now available in Claude Code. (Restart Claude Code if it was open.)
+
+## Use it
+
+In any project, just tell Claude what you decided:
+
+- `/decision-tree add` — log a new decision (Claude drafts title, options, tradeoffs, the choice and
+  why, then writes it once you confirm)
+- `/decision-tree revise <id>` — record a change to a past decision (keeps the history)
+- `/decision-tree plan` — weigh a new feature against existing decisions before you build
+- `/decision-tree view` — (re)generate the viewer and get the path to open
+- `/decision-tree list` — a compact text summary
+
+The skill creates a `decisions/` folder in your project (one `NNNN-slug.json` per decision, plus
+`_project.json`) and keeps the viewer in sync.
+
+## Open the viewer
+
+The viewer reads the decision files live over `http://`, so serve the folder rather than
+double-clicking the file:
+
+```sh
+cd your-project/decisions
+python3 -m http.server
+# then open http://localhost:8000/
+```
+
+(Opening `index.html` directly via `file://` won't work — browsers block local file reads.)
+
+## Optional: the backstop hook
+
+A `Stop` hook can nudge Claude at the end of each turn to check that every decision made in the
+conversation got logged. To enable it in a project:
+
+```sh
+mkdir -p your-project/.claude/hooks
+cp skill/hooks/reconcile-decisions.py your-project/.claude/hooks/
+```
+
+Then merge `skill/settings.example.json` into `your-project/.claude/settings.json` and open `/hooks`
+(or restart Claude Code) so it takes effect. The hook uses `$CLAUDE_PROJECT_DIR`, so it's portable
+across projects.
+
+## Keeping this package up to date
+
+The files in `skill/` are **copies** of the live skill at `~/.claude/skills/decision-tree/`. If you
+improve the viewer or `SKILL.md`, re-copy them here before sharing:
+
+```sh
+cp ~/.claude/skills/decision-tree/SKILL.md skill/SKILL.md
+cp ~/.claude/skills/decision-tree/generate.py skill/generate.py
+cp ~/.claude/skills/decision-tree/viewer/* skill/viewer/
+```
+
+## Requirements
+
+- [Claude Code](https://claude.com/claude-code)
+- Python 3 (standard library only — no `pip install`)

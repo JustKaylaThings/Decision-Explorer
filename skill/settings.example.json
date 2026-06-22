@@ -1,0 +1,18 @@
+{
+  "//": "Copy this into your project's .claude/settings.json (merge with anything already there) to enable the decision-log backstop. $CLAUDE_PROJECT_DIR is filled in by Claude Code, so the path works in any project. After adding it, open /hooks or restart Claude Code for the hook to take effect.",
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/reconcile-decisions.py\"",
+            "timeout": 30,
+            "statusMessage": "Reconciling decision log…"
+          }
+        ]
+      }
+    ]
+  }
+}
