@@ -49,8 +49,13 @@ skill/                     the installable skill
 ├── viewer/                the decision explorer (app.js, styles.css, index.html)
 ├── hooks/                 reconcile-decisions.py — optional Stop-hook backstop
 └── settings.example.json  hook wiring to merge into a project's .claude/settings.json
-decisions/                 this project's own decision log — a live example (open it in the viewer)
+decisions/                 this project's own decision log — a live example (the JSON source;
+                           build the viewer from it with the generator, then open — see below)
 ```
+
+> The `decisions/` folder holds the **source** (one JSON file per decision). The viewer
+> (`index.html` / `app.js` / `styles.css` / `graph.html`) is **generated** from it, so it isn't
+> committed — build it after cloning (next section).
 
 ## Install (once)
 
@@ -143,11 +148,18 @@ personalize your explorer:
 
 ## Open the viewer
 
+First **build the viewer** from the decision files (in your own project, `/decision-tree view` does
+this for you; to browse this repo's example after cloning, run the generator directly):
+
+```sh
+python3 skill/generate.py decisions decisions/graph.html
+```
+
 The viewer reads the decision files live over `http://`, so serve the folder rather than
 double-clicking the file:
 
 ```sh
-cd your-project/decisions
+cd decisions
 python3 -m http.server
 # then open http://localhost:8000/
 ```

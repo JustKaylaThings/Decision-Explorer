@@ -1,6 +1,13 @@
 .DS_Store
 __pycache__/
 *.pyc
-.claude/state/
-# Project-local skill install — the shareable copy lives in skill/ (kept on disk, not published)
-.claude/skills/
+# Local Claude Code config — portable copies for sharing live in skill/ (kept on disk, not published)
+.claude/
+
+# Generated/symlinked viewer output — built from the decision JSON by the generator, not source.
+# (Locally these are symlinks to the shared viewer; they must never be committed.)
+decisions/app.js
+decisions/index.html
+decisions/styles.css
+decisions/graph.html
+decisions/manifest.json
