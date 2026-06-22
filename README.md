@@ -72,6 +72,38 @@ In any project, just tell Claude what you decided:
 The skill creates a `decisions/` folder in your project (one `NNNN-slug.json` per decision, plus
 `_project.json`) and keeps the viewer in sync.
 
+## Make it yours
+
+The viewer reads a small `decisions/_project.json` (the skill creates it for you). Edit it to
+personalize your explorer:
+
+- **Name it** — the title shown big at the top of the page:
+
+  ```json
+  { "project": "My App — Decisions" }
+  ```
+
+  Defaults to "Decisions" if you leave it out.
+
+- **Add an app icon** — drop an image named `icon.png` or `icon.svg` into your `decisions/` folder and
+  it appears next to the title (it also tries `favicon.png` / `favicon.svg` / `favicon.ico`). To use a
+  different filename, point to it explicitly:
+
+  ```json
+  { "project": "My App — Decisions", "icon": "logo.png" }
+  ```
+
+- **Group by a second dimension** *(optional)* — if your decisions map onto something like a screen or
+  module, add a `secondaryAxis` label and the viewer gains a "By &lt;label&gt;" grouping mode plus
+  filter chips:
+
+  ```json
+  { "project": "My App — Decisions", "secondaryAxis": "Screen" }
+  ```
+
+  Then decisions can carry an `area` value (Claude sets this when you mention which screen/module a
+  decision belongs to).
+
 ## Open the viewer
 
 The viewer reads the decision files live over `http://`, so serve the folder rather than

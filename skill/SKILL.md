@@ -17,7 +17,9 @@ Source of truth is **one file per decision** in `decisions/`:
 - `decisions/_project.json` — project-level metadata: `{ "project": "<dir name>" }`. Optional
   `"secondaryAxis": "<label>"` (e.g. `"Screen"`) turns on a second grouping dimension: decisions may
   then carry an `area` value, and the viewer gains a "By &lt;label&gt;" grouping mode plus filter chips.
-  Leave it unset for projects without such a dimension (the field then stays invisible).
+  Leave it unset for projects without such a dimension (the field then stays invisible). Optional
+  `"icon": "<path>"` points at an app icon in `decisions/` (the viewer also auto-detects
+  `icon.png` / `icon.svg` / `favicon.*`); it shows next to the hero title, hidden if none is found.
 - `decisions/[v<version>/]NNNN-slug.json` — one decision per file (see schema below). `NNNN` is the
   zero-padded decision number (matches the `id`, e.g. `d7` → `0007-…`) and orders the files
   chronologically; `slug` is a kebab-case of the title. Files are filed in a **per-version
@@ -207,7 +209,7 @@ Report the output path; the user opens it in a browser.
 `decisions/_project.json`:
 
 ```json
-{ "project": "string", "secondaryAxis": "string (optional, e.g. \"Screen\")" }
+{ "project": "string", "secondaryAxis": "string (optional, e.g. \"Screen\")", "icon": "string (optional; path to an app icon in decisions/, e.g. \"icon.png\")" }
 ```
 
 Each `decisions/NNNN-slug.json` is a single decision object (no wrapper array):
