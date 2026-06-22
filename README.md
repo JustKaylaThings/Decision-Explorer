@@ -77,6 +77,32 @@ The skill creates a `decisions/` folder in your project (one `NNNN-slug.json` pe
 > run `/grill-me` to pressure-test a choice *before* you log it, so what lands in the tree is the
 > version you've already stress-tested. Decision Explorer works fine on its own.
 
+## The approach
+
+This tool is built around a way of working — it pays off when you lean into these habits:
+
+- **Log the decision when you make it, not later.** The moment you pick between options is when the
+  reasoning is freshest. Claude drafts the decision on the spot and you confirm or edit before
+  anything is written — so the log is something you actually approved, never a guess reconstructed
+  weeks later. (A backstop hook quietly catches anything that slipped through at the end of a turn.)
+- **Record what you *didn't* choose.** A decision is the options you weighed and their tradeoffs — not
+  just the winner. Capturing the rejected paths and *why* they lost is the whole point; it's what
+  stops you (or a teammate) re-litigating the same choice six months on.
+- **Lead with the choice and the why.** Each decision opens with what you picked and the deciding
+  reason; the full options × tradeoffs sit one toggle below. Keep it scannable.
+- **Name the everyday topic, not the tech.** Title a decision "Where data is stored," not "SQLite vs
+  Expo storage." You should be able to scan the list months later and know what each one was about
+  without remembering the tools involved.
+- **Consult before you build.** Before starting a new feature, run `/decision-tree plan` to weigh it
+  against what's already been decided — so new work builds on past reasoning instead of quietly
+  contradicting it.
+- **Revise, don't overwrite.** When a choice changes, record the change *with its reason* and keep the
+  history. The log should stay true — including the U-turns.
+
+The viewer exists to **review** all of this: decisions grouped by where in the lifecycle they were
+made (Requirements → Design → … → Maintenance), choice-and-why first. It's a browsable record of how
+the project got where it is — not a dashboard, not a graph for its own sake.
+
 ## Make it yours
 
 The viewer reads a small `decisions/_project.json` (the skill creates it for you). Edit it to
