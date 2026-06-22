@@ -72,6 +72,11 @@ In any project, just tell Claude what you decided:
 The skill creates a `decisions/` folder in your project (one `NNNN-slug.json` per decision, plus
 `_project.json`) and keeps the viewer in sync.
 
+> **Pairs well with `grill-me`** — a separate, optional Claude Code skill that interviews you
+> relentlessly about a plan until every branch of the decision is resolved. If you have it installed,
+> run `/grill-me` to pressure-test a choice *before* you log it, so what lands in the tree is the
+> version you've already stress-tested. Decision Explorer works fine on its own.
+
 ## Make it yours
 
 The viewer reads a small `decisions/_project.json` (the skill creates it for you). Edit it to
