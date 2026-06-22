@@ -2,3 +2,5 @@
 __pycache__/
 *.pyc
 .claude/state/
+# Project-local skill install — the shareable copy lives in skill/ (kept on disk, not published)
+.claude/skills/
