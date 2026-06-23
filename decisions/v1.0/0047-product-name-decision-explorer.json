@@ -15,7 +15,8 @@
   "history": [
     {
       "from": "Decision Explorer",
-      "reason": "Added 'AI' so the public name signals the tool is AI-native / Claude-driven; same low-risk scope as the original rename (command, install path and folder untouched)."
+      "reason": "Added 'AI' so the public name signals the tool is AI-native / Claude-driven; same low-risk scope as the original rename (command, install path and folder untouched).",
+      "date": "2026-06-23T09:43:07"
     }
   ],
   "options": [

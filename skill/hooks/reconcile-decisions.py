@@ -59,7 +59,7 @@ REASON = (
     "options, and tradeoffs (and for a change, what it was and why) — and ask them to confirm "
     "or edit. Only after they approve, update the per-decision files in '" + SRC_DIR + "/' "
     "(create a new NNNN-slug.json, or for a change edit that decision's file: set old option "
-    "chosen=false / new chosen=true and append {from, reason} to history[]) and regenerate:\n"
+    "chosen=false / new chosen=true and append {from, reason, date} to history[], stamping date from `date \"+%Y-%m-%dT%H:%M:%S\"` so the revision shows as recent activity) and regenerate:\n"
     "  python3 '" + GEN + "' '" + SRC_DIR + "' '" + OUT + "'\n"
     "If everything is already captured, just say so briefly. Do NOT run this check more than once."
 )

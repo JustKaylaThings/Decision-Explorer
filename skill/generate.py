@@ -1279,6 +1279,20 @@ def main():
         outdir = os.path.dirname(sys.argv[2]) or "."
 
     project, axis, decisions, files = load_decisions(ddir)
+
+    # Guard (d47 backstop): a revision whose NEWEST history entry has no "date" can't be placed in
+    # time, so Recent sorting falls back to the original decision date and the change never surfaces
+    # in the "Last 24 hours" bucket. Every history entry must be stamped (see SKILL.md `revise`).
+    # Warn loudly so a dropped timestamp is caught on the very next regenerate. Only the newest
+    # entry matters here — older undated entries (decisions logged before timestamps) still sort fine.
+    undated = [fn for fn, d in zip(files, decisions)
+               if (d.get("history") or []) and "date" not in d["history"][-1]]
+    if undated:
+        print("WARNING: latest revision missing a \"date\" (won't show as recent activity) in:\n  "
+              + "\n  ".join(undated)
+              + "\n  Add \"date\": \"<YYYY-MM-DDThh:mm:ss>\" to the newest history[] entry "
+                "(stamp via `date \"+%Y-%m-%dT%H:%M:%S\"`), then regenerate.", file=sys.stderr)
+
     os.makedirs(outdir, exist_ok=True)
 
     # 1. manifest.json — ALWAYS regenerated: just the ordered list of decision filenames.
