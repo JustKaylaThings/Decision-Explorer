@@ -1,6 +1,7 @@
 # Decision Explorer
 
 <p align="center">
+  <a href="https://decision-explorer.netlify.app/"><strong>Live demo</strong></a> ·
   <a href="https://github.com/JustKaylaThings">GitHub</a> ·
   <a href="https://www.linkedin.com/in/kaylamichjones/">LinkedIn</a> ·
   <a href="https://kayjo.co">Website</a>
@@ -27,6 +28,8 @@ offline.
   <img src="docs/viewer-detail.png" alt="A single decision opened — its chosen option, the reasoning, dependency links, and the full options-by-tradeoffs comparison" width="620"><br>
   <em>Open one to see the chosen option, the why, and the full options × tradeoffs comparison.</em>
 </p>
+
+> **▶ [Try the live viewer](https://decision-explorer.netlify.app/)** — this project's own decision log, explored in your browser.
 
 ## Quickstart (30 seconds)
 
