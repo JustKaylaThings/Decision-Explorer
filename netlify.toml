@@ -1,4 +1,4 @@
-# Netlify build config for the Decision Explorer viewer.
+# Netlify build config for the Decision Explorer AI viewer.
 #
 # The committed repo holds only the decision DATA (decisions/v1.0/*.json, _project.json,
 # icon.png) plus the generator (skill/generate.py). The viewer's index.html / app.js /

@@ -1,4 +1,4 @@
-# Decision Explorer
+# Decision Explorer AI
 
 <p align="center">
   <a href="https://decision-explorer.netlify.app/"><strong>Live demo</strong></a> ·
@@ -20,7 +20,7 @@ No build step, no dependencies beyond **Python 3** — the viewer is plain HTML/
 offline.
 
 <p align="center">
-  <img src="docs/viewer.png" alt="The Decision Explorer viewer — a searchable list of decisions grouped by recency, with cards showing each decision's chosen option" width="900"><br>
+  <img src="docs/viewer.png" alt="The Decision Explorer AI viewer — a searchable list of decisions grouped by recency, with cards showing each decision's chosen option" width="900"><br>
   <em>Browse every decision, grouped by recency or lifecycle phase.</em>
 </p>
 
@@ -89,7 +89,7 @@ The skill creates a `decisions/` folder in your project (one `NNNN-slug.json` pe
 > **Pairs well with `grill-me`** — a separate, optional Claude Code skill that interviews you
 > relentlessly about a plan until every branch of the decision is resolved. If you have it installed,
 > run `/grill-me` to pressure-test a choice *before* you log it, so what lands in the tree is the
-> version you've already stress-tested. Decision Explorer works fine on its own.
+> version you've already stress-tested. Decision Explorer AI works fine on its own.
 
 ## The approach
 
@@ -211,5 +211,5 @@ cp ~/.claude/skills/decision-tree/viewer/*      skill/viewer/
 ## Inspiration
 
 This project was inspired by Alan Knox's book **[AI Builders](https://amzn.to/3SodJoj)** — its ideas
-about building with AI shaped the approach behind Decision Explorer. You can also find Alan on
+about building with AI shaped the approach behind Decision Explorer AI. You can also find Alan on
 [LinkedIn](https://www.linkedin.com/in/alanknox/).

@@ -433,7 +433,7 @@ INDEX_HTML = r'''<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Decision Explorer</title>
+<title>Decision Explorer AI</title>
 <link rel="stylesheet" href="styles.css">
 <script>
   /* set the theme before paint so there's no flash */
@@ -450,7 +450,7 @@ INDEX_HTML = r'''<!DOCTYPE html>
 <body>
 <main>
   <header class="topbar">
-    <span class="topbar-brand">Decision Explorer</span>
+    <span class="topbar-brand">Decision Explorer AI</span>
     <nav class="topbar-right" aria-label="Top">
       <a class="topbar-cta" id="templateLink" href="https://github.com/JustKaylaThings/Decision-Explorer" target="_blank" rel="noopener">Get the free template</a>
       <button class="iconbtn" id="theme" title="Toggle light/dark">&#9728;</button>
@@ -498,7 +498,7 @@ INDEX_HTML = r'''<!DOCTYPE html>
   <div id="list"></div>
 </main>
 <footer class="site-foot">
-  <span class="foot-credit">Decision Explorer &middot; Made by <strong>Kayla Jones</strong></span>
+  <span class="foot-credit">Decision Explorer AI &middot; Made by <strong>Kayla Jones</strong></span>
   <nav class="foot-links" aria-label="Links">
     <a href="https://github.com/JustKaylaThings" target="_blank" rel="noopener">GitHub</a>
     <span class="foot-dot" aria-hidden="true">&middot;</span>
@@ -536,7 +536,7 @@ INDEX_HTML = r'''<!DOCTYPE html>
 '''
 
 
-APP_JS = r'''// Decision Explorer logic. Reads window.DT_DATA (set by data.js) and renders an apple.com-style
+APP_JS = r'''// Decision Explorer AI logic. Reads window.DT_DATA (set by data.js) and renders an apple.com-style
 // card grid grouped by phase, with a modal sheet for one decision at a time. Edit styles.css for
 // looks. Loaded as a classic script so index.html opens by double-click (file://) — no server.
 // Read the decision JSON files directly at runtime (d28 revised): fetch manifest.json for the
@@ -633,7 +633,7 @@ function byRecency(a, b){
 function setHeader(){
   const t = document.getElementById('title'); if (t) t.textContent = PROJECT;
   const ht = document.getElementById('heroTitle'); if (ht) ht.textContent = PROJECT;
-  document.title = PROJECT + ' — Decision Explorer';
+  document.title = PROJECT + ' — Decision Explorer AI';
   // Count every decision-event: each logged decision plus each revision is a decision that was made,
   // so the headline reflects the true total, not just the created count (d38).
   const logged = RAW.length;
@@ -1233,7 +1233,7 @@ document.addEventListener('keydown', e => {
 
 REDIRECT_HTML = '''<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta http-equiv="refresh" content="0; url=index.html">
-<title>Decision Explorer</title></head>
+<title>Decision Explorer AI</title></head>
 <body><a href="index.html">Open the decision explorer &rarr;</a></body></html>
 '''
 

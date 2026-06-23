@@ -1,4 +1,4 @@
-// Decision Explorer logic. Reads window.DT_DATA (set by data.js) and renders an apple.com-style
+// Decision Explorer AI logic. Reads window.DT_DATA (set by data.js) and renders an apple.com-style
 // card grid grouped by phase, with a modal sheet for one decision at a time. Edit styles.css for
 // looks. Loaded as a classic script so index.html opens by double-click (file://) — no server.
 // Read the decision JSON files directly at runtime (d28 revised): fetch manifest.json for the
@@ -95,7 +95,7 @@ function byRecency(a, b){
 function setHeader(){
   const t = document.getElementById('title'); if (t) t.textContent = PROJECT;
   const ht = document.getElementById('heroTitle'); if (ht) ht.textContent = PROJECT;
-  document.title = PROJECT + ' — Decision Explorer';
+  document.title = PROJECT + ' — Decision Explorer AI';
   // Count every decision-event: each logged decision plus each revision is a decision that was made,
   // so the headline reflects the true total, not just the created count (d38).
   const logged = RAW.length;
