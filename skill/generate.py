@@ -46,8 +46,8 @@ STYLES_CSS = r'''
   --muted:#98989d; --faint:#6e6e73; --line:#2a2a2c; --line2:#3a3a3c;
   --accent:#3bc4b6; --accent-soft:rgba(59,196,182,.14); --focus:rgba(59,196,182,.42);
   --nav-blur:rgba(0,0,0,.6);
-  --pos:#54c98a; --neg:#f0746b; --neu:#dab35f;
-  --pos-soft:rgba(84,201,138,.12); --neg-soft:rgba(240,116,107,.12);
+  --pos:#54c98a; --neg:#f0746b; --neu:#dab35f; --build:#7e8bdc;
+  --pos-soft:rgba(84,201,138,.12); --neg-soft:rgba(240,116,107,.12); --build-soft:rgba(126,139,220,.13);
   --shadow-sm:0 1px 2px rgba(0,0,0,.4); --shadow-card:0 1px 3px rgba(0,0,0,.3);
   --shadow-hover:0 14px 36px rgba(0,0,0,.55); --shadow-modal:0 30px 90px rgba(0,0,0,.65);
   --radius:14px; --radius-lg:20px; --radius-xl:26px;
@@ -57,8 +57,8 @@ STYLES_CSS = r'''
   --muted:#6e6e73; --faint:#86868b; --line:#e6e6e9; --line2:#d2d2d7;
   --accent:#0d8478; --accent-soft:rgba(13,132,120,.09); --focus:rgba(13,132,120,.28);
   --nav-blur:rgba(251,251,253,.72);
-  --pos:#1f9e57; --neg:#d1453b; --neu:#9a7320;
-  --pos-soft:rgba(31,158,87,.08); --neg-soft:rgba(209,69,59,.07);
+  --pos:#1f9e57; --neg:#d1453b; --neu:#9a7320; --build:#5159c0;
+  --pos-soft:rgba(31,158,87,.08); --neg-soft:rgba(209,69,59,.07); --build-soft:rgba(81,89,192,.08);
   --shadow-sm:0 1px 2px rgba(0,0,0,.07); --shadow-card:0 2px 12px rgba(0,0,0,.05);
   --shadow-hover:0 14px 34px rgba(0,0,0,.1); --shadow-modal:0 30px 90px rgba(0,0,0,.2);
 }
@@ -71,7 +71,15 @@ body { background:var(--bg); color:var(--ink);
 body.no-scroll { overflow:hidden; }
 
 /* ---- floating top buttons (theme + help) ---- */
-.topbtns { position:absolute; top:14px; right:18px; z-index:30; display:flex; gap:8px; }
+/* top bar — product wordmark + free-template CTA, with the icon buttons folded in */
+.topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px 0 0; }
+.topbar-brand { font-size:15px; font-weight:600; letter-spacing:-.01em; color:var(--ink); }
+.topbar-right { display:flex; align-items:center; gap:9px; }
+.topbar-cta { font-size:13px; font-weight:500; color:var(--accent); text-decoration:none; white-space:nowrap;
+              padding:6px 13px; border:1px solid var(--line2); border-radius:980px;
+              transition:background .15s ease, border-color .15s ease; }
+.topbar-cta:hover { background:var(--accent-soft); border-color:var(--accent); }
+@media (max-width:680px){ .topbar-brand { font-size:14px; } .topbar-cta { padding:5px 10px; } }
 .app-icon { border-radius:6px; object-fit:cover; flex:none; }
 .app-icon[hidden] { display:none; }
 .tab { font-size:12.5px; font-weight:500; padding:6px 14px; border-radius:980px; border:none;
@@ -84,7 +92,18 @@ body.no-scroll { overflow:hidden; }
 .iconbtn:hover { color:var(--ink); background:var(--line2); }
 
 /* ---- page ---- */
-main { max-width:1160px; margin:0 auto; padding:0 32px 120px; }
+main { max-width:1160px; margin:0 auto; padding:0 32px 72px; }
+
+/* creator credit — calm centered footer, mirrors the README's link row */
+.site-foot { max-width:1160px; margin:0 auto; padding:26px 32px 48px; border-top:1px solid var(--line);
+             display:flex; flex-direction:column; align-items:center; gap:7px; text-align:center; }
+.foot-credit { font-size:13px; color:var(--faint); letter-spacing:-.01em; }
+.foot-credit strong { font-weight:600; color:var(--ink2); }
+.foot-links { display:flex; align-items:center; gap:11px; font-size:13px; }
+.foot-links a { color:var(--muted); text-decoration:none; transition:color .15s ease; }
+.foot-links a:hover { color:var(--accent); }
+.foot-dot { color:var(--line2); }
+@media (max-width:680px){ .site-foot { padding:22px 18px 36px; } }
 
 /* control bar above the list — sticks under the nav; search is the prominent element */
 .toolbar { position:sticky; top:0; z-index:15; display:flex; align-items:center; flex-wrap:wrap;
@@ -98,7 +117,7 @@ main { max-width:1160px; margin:0 auto; padding:0 32px 120px; }
 .tb-search input::-webkit-search-cancel-button { -webkit-appearance:none; }
 .tb-right { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 
-/* segmented controls (Sort + View) — reuse the .tab pill styling */
+/* segmented control (View) — reuse the .tab pill styling */
 .seg { display:inline-flex; align-items:center; gap:2px; background:var(--card); padding:2px;
        border-radius:980px; border:1px solid var(--line); }
 .seg-lbl { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px;
@@ -106,7 +125,29 @@ main { max-width:1160px; margin:0 auto; padding:0 32px 120px; }
 .tab-icon { display:inline-flex; align-items:center; justify-content:center; padding:6px 11px; }
 .tab-icon > svg { width:16px; height:16px; display:block; }
 
-/* filter button + drawer */
+/* Sort dropdown — one button + popover menu, so the choices stay collapsed as grouping
+   modes grow (Recent / By phase / By <axis> / By version), instead of a widening pill row (d30 revised). */
+.sort-wrap { position:relative; }
+.sort-btn { display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:500; padding:7px 11px 7px 4px;
+            border-radius:980px; border:1px solid var(--line2); background:var(--card); color:var(--ink); cursor:pointer; transition:.15s; }
+.sort-btn:hover { border-color:var(--ink2); }
+.sort-wrap.open .sort-btn { border-color:var(--accent); }
+.sort-btn .seg-lbl { padding:0 0 0 8px; }
+.sort-cur { font-weight:600; }
+.sort-caret { width:14px; height:14px; color:var(--muted); transition:transform .18s; }
+.sort-wrap.open .sort-caret { transform:rotate(180deg); }
+.sort-menu { position:absolute; top:calc(100% + 6px); left:0; min-width:172px; z-index:30;
+             background:var(--surface); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow-modal);
+             padding:6px; opacity:0; transform:translateY(-4px); pointer-events:none; transition:opacity .15s,transform .15s; }
+.sort-wrap.open .sort-menu { opacity:1; transform:none; pointer-events:auto; }
+.sort-opt { display:flex; align-items:center; gap:9px; width:100%; text-align:left; font-size:13.5px; padding:8px 12px 8px 8px;
+            border:none; background:transparent; color:var(--ink); border-radius:8px; cursor:pointer; white-space:nowrap; }
+.sort-opt:hover { background:var(--card); }
+.sort-check { width:14px; flex:none; color:var(--accent); font-weight:800; visibility:hidden; }
+.sort-opt.on .sort-check { visibility:visible; }
+.sort-opt.on { font-weight:600; }
+
+/* filter button + popover */
 .filter-wrap { position:relative; }
 .filter-btn { display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:500; padding:8px 14px;
               border-radius:980px; border:1px solid var(--line2); background:var(--card); color:var(--ink); cursor:pointer; transition:.15s; }
@@ -153,12 +194,14 @@ main { max-width:1160px; margin:0 auto; padding:0 32px 120px; }
 }
 
 /* hero */
-.hero { text-align:center; padding:72px 0 16px; }
+.hero { text-align:center; padding:48px 0 16px; }
 .hero-name { display:flex; align-items:center; justify-content:center; gap:clamp(12px,2vw,20px); }
 .hero-icon { width:clamp(46px,7vw,72px); height:clamp(46px,7vw,72px); border-radius:20px; box-shadow:var(--shadow-card); }
 .hero h1 { font-size:clamp(40px,7vw,80px); font-weight:700; letter-spacing:-.035em; line-height:1.03; margin:0; }
 .hero-sub { font-size:clamp(17px,2.1vw,21px); font-weight:400; color:var(--muted); letter-spacing:-.01em;
             margin:18px 0 0; }
+.hero-count { display:block; }
+.hero-break { display:block; margin-top:5px; font-size:.7em; color:var(--faint); }
 .hero-filters { display:flex; justify-content:center; flex-wrap:wrap; gap:8px; margin-top:30px; }
 .hero-filters:empty { display:none; }
 .chip { font-size:12.5px; padding:5px 13px; border-radius:980px; cursor:pointer;
@@ -171,6 +214,7 @@ main { max-width:1160px; margin:0 auto; padding:0 32px 120px; }
 /* phase sections */
 .phase-sec { margin-top:60px; }
 .phase-sec.pinned .sec-name { color:var(--neg); }
+.phase-sec.pinned-build .sec-name { color:var(--build); }
 .sec-head { display:flex; align-items:center; gap:11px; margin-bottom:24px; padding-bottom:15px;
             border-bottom:1px solid var(--line); cursor:pointer; user-select:none; }
 .sec-head:focus-visible { outline:none; box-shadow:0 0 0 3px var(--focus); border-radius:8px; }
@@ -192,16 +236,31 @@ main { max-width:1160px; margin:0 auto; padding:0 32px 120px; }
 .card-head { display:flex; align-items:center; gap:8px; margin-bottom:14px; }
 .phase-pill { font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
               padding:3px 10px; border-radius:980px; }
+.card-id { font-size:11px; font-weight:600; color:var(--faint); font-variant-numeric:tabular-nums; letter-spacing:.02em; }
 .card-date { margin-left:auto; font-size:12px; color:var(--faint); font-variant-numeric:tabular-nums; }
 .card-title { font-size:20px; font-weight:600; letter-spacing:-.02em; line-height:1.24; margin:0 0 13px; color:var(--ink); }
 .card-chosen { font-size:14px; font-weight:600; color:var(--accent); line-height:1.4; margin-bottom:11px; }
 .card-chosen.open { color:var(--neg); }
 .card-why { font-size:14px; color:var(--ink2); line-height:1.55; margin:0;
-            display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+            display:-webkit-box; -webkit-line-clamp:3; line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
 .card-foot { margin-top:15px; display:flex; gap:7px; align-items:center; flex-wrap:wrap; }
 .card-cat, .card-rev { font-size:11px; padding:3px 9px; border-radius:980px; border:1px solid var(--line2); }
 .card-cat { color:var(--muted); }
 .card-rev { color:var(--neu); border-color:var(--neu); }
+.card-ver { font-size:11px; padding:3px 9px; border-radius:980px; color:var(--accent); border:1px solid var(--accent); background:var(--accent-soft); font-variant-numeric:tabular-nums; }
+.card-build { font-size:11px; padding:3px 9px; border-radius:980px; color:var(--build); border:1px solid var(--build); background:var(--build-soft); font-weight:500; }
+
+/* Revision shown as its own slim card in the Recent stream (d38) — reads as secondary to a full decision card. */
+.revcard { border-style:dashed; box-shadow:none; }
+.revcard:hover { box-shadow:var(--shadow-card); }
+.revcard .card-title { font-size:16px; margin:0 0 8px; }
+.revcard-kind { font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:var(--neu); }
+.revcard-from { font-size:13px; color:var(--muted); margin:0 0 8px; }
+.revcard-link { font-size:12.5px; color:var(--accent); font-weight:500; }
+.revrow .row-title { font-weight:500; display:flex; align-items:center; }
+.revrow-kind { flex:none; font-size:9.5px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:var(--neu);
+               border:1px solid var(--neu); border-radius:980px; padding:1px 7px; margin-right:8px; }
+.revrow .row-chosen { color:var(--muted); }
 
 /* compact list view (alternative to the card grid) */
 .dlist { border:1px solid var(--line); border-radius:var(--radius-lg); overflow:hidden; background:var(--card); box-shadow:var(--shadow-card); }
@@ -214,12 +273,15 @@ main { max-width:1160px; margin:0 auto; padding:0 32px 120px; }
 .row-title { font-size:15px; font-weight:600; letter-spacing:-.01em; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .row-chosen { font-size:12.5px; color:var(--accent); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .row-chosen.open { color:var(--neg); }
+.row-id { font-size:11px; font-weight:600; color:var(--faint); flex:none; font-variant-numeric:tabular-nums; min-width:30px; }
 .row-cat, .row-rev { font-size:11px; padding:2px 9px; border-radius:980px; flex:none; }
 .row-cat { color:var(--muted); border:1px solid var(--line2); }
 .row-rev { color:var(--neu); border:1px solid var(--neu); }
+.row-ver { font-size:11px; padding:2px 9px; border-radius:980px; flex:none; color:var(--accent); border:1px solid var(--accent); background:var(--accent-soft); font-variant-numeric:tabular-nums; }
+.row-build { font-size:11px; padding:2px 9px; border-radius:980px; flex:none; color:var(--build); border:1px solid var(--build); background:var(--build-soft); }
 .row-date { font-size:12px; color:var(--faint); flex:none; font-variant-numeric:tabular-nums; min-width:86px; text-align:right; }
 .row-arrow { color:var(--faint); font-size:18px; line-height:1; flex:none; }
-@media (max-width:680px){ .row-cat, .row-rev, .row-date { display:none; } }
+@media (max-width:680px){ .row-cat, .row-rev, .row-ver, .row-date { display:none; } }
 
 .empty-state { color:var(--muted); text-align:center; padding:90px 20px; line-height:1.7; font-size:15px; }
 code { background:var(--card); padding:2px 7px; border-radius:6px; font-size:13px; }
@@ -239,49 +301,86 @@ code { background:var(--card); padding:2px 7px; border-radius:6px; font-size:13p
                cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:.15s; }
 .sheet-close:hover { background:var(--line2); color:var(--ink); }
 
-.d-title { font-size:31px; font-weight:700; letter-spacing:-.025em; line-height:1.15; margin:0 30px 14px 0; }
-.d-sub { display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:12.5px; color:var(--muted); margin:0 0 26px; }
-.d-sub .pdot { width:8px; height:8px; border-radius:50%; flex:none; }
+.d-eyebrow { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0 0 15px; }
+.phase-chip { display:inline-flex; align-items:center; gap:7px; font-size:12px; font-weight:600; color:var(--ink);
+              padding:4px 12px 4px 10px; border-radius:980px; background:color-mix(in srgb, var(--pc) 16%, transparent); }
+.phase-chip .pdot { width:7px; height:7px; border-radius:50%; background:var(--pc); flex:none; }
+.d-id { font-size:11px; font-weight:700; color:var(--faint); background:var(--card); border:1px solid var(--line);
+        border-radius:980px; padding:2px 9px; font-variant-numeric:tabular-nums; letter-spacing:.02em; }
+.d-meta { display:inline-flex; align-items:center; gap:10px; font-size:12.5px; color:var(--muted); }
+.d-meta::before { content:"·"; color:var(--faint); }
+.d-title { font-size:32px; font-weight:700; letter-spacing:-.025em; line-height:1.13; margin:0 36px 12px 0; color:var(--ink); }
+.d-question { font-size:18px; font-weight:400; line-height:1.45; letter-spacing:-.01em; color:var(--muted); margin:0 0 30px; max-width:60ch; }
 .tag { font-size:10px; padding:2px 9px; border-radius:980px; border:1px solid var(--line2); }
 .tag.open { color:var(--neg); border-color:var(--neg); }
 .tag.revised { color:var(--neu); border-color:var(--neu); cursor:pointer; }
+.tag.unbuilt { color:var(--build); border-color:var(--build); }
 
-.chosen-box { background:var(--pos-soft); border-radius:var(--radius-lg); padding:20px 22px; margin-bottom:28px; }
-.chosen-box.open { background:var(--neg-soft); }
-.chosen-cap { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:6px; }
-.chosen-val { font-size:18px; font-weight:600; color:var(--pos); line-height:1.4; letter-spacing:-.01em; }
-.chosen-box.open .chosen-val { color:var(--neg); }
-.chosen-box .why { margin-top:14px; font-size:14.5px; line-height:1.65; color:var(--ink2); }
-.why-q { font-size:12.5px; color:var(--muted); font-style:italic; margin-top:12px; }
-.why-q.sep { padding-top:12px; border-top:1px solid var(--line); }
+.answer { display:flex; align-items:flex-start; gap:14px; padding:17px 20px; margin:0 0 36px; background:var(--pos-soft);
+          border:1px solid color-mix(in srgb, var(--pos) 24%, transparent); border-radius:var(--radius-lg); }
+.answer.open { background:var(--neg-soft); border-color:color-mix(in srgb, var(--neg) 24%, transparent); }
+.answer-mark { flex:none; width:26px; height:26px; margin-top:1px; border-radius:50%; background:var(--pos); color:#fff;
+               font-size:14px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; }
+.answer.open .answer-mark { background:var(--neg); }
+.answer-cap { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:4px; }
+.answer-val { font-size:19px; font-weight:600; color:var(--ink); line-height:1.34; letter-spacing:-.015em; }
+.answer.unbuilt { background:var(--build-soft); border-color:color-mix(in srgb, var(--build) 24%, transparent); }
+.answer.unbuilt .answer-mark { background:var(--build); }
+.answer-build { font-size:13px; color:var(--build); font-weight:500; margin-top:5px; }
+.block { margin:0 0 30px; }
+.eyebrow { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--muted); margin-bottom:12px; }
+.eyebrow-n { font-weight:500; text-transform:none; letter-spacing:0; color:var(--faint); margin-left:5px; }
+.why-text { font-size:15.5px; line-height:1.72; color:var(--ink2); margin:0; max-width:64ch; }
 
-.section { margin:0 0 24px; }
-.lbl { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--faint); margin-bottom:8px; }
-.lbl-n { font-weight:500; text-transform:none; letter-spacing:0; color:var(--faint); }
-.section.impact { margin-bottom:16px; display:grid; gap:12px 28px;
-                  grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); align-items:start; }
-@media (max-width:560px){ .section.impact { grid-template-columns:1fr; } }
+.impact { display:grid; gap:22px 36px; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); align-items:start; }
+@media (max-width:560px){ .impact { grid-template-columns:1fr; } }
 
-.dep-row { display:flex; align-items:center; gap:9px; padding:9px 2px; cursor:pointer; border-bottom:1px solid var(--line); }
-.dep-row:last-child { border-bottom:none; }
+.dep-row { display:flex; align-items:center; gap:8px; padding:7px 8px 7px 3px; cursor:pointer; border-radius:9px; }
+.dep-row:hover { background:var(--accent-soft); }
 .dep-row:hover .dep-name { color:var(--accent); }
-.dep-arrow { color:var(--faint); font-size:13px; flex:none; }
-.dep-name { font-size:13.5px; color:var(--ink2); flex:1; }
-.dep-row.nested .dep-arrow { opacity:.55; }
-.dep-row.nested .dep-name { color:var(--muted); font-size:12.5px; }
+.dep-name { font-size:13.5px; color:var(--ink2); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.dep-arrow { color:var(--faint); font-size:13px; flex:none; width:16px; text-align:center; }
+/* downstream tree: caret toggles, indent guides, descendant count */
+.dep-caret { flex:none; width:17px; height:17px; display:inline-flex; align-items:center; justify-content:center;
+             font-size:9px; color:var(--faint); border-radius:5px; transition:background .12s,color .12s; }
+.dep-caret:not(.leaf) { cursor:pointer; }
+.dep-caret:not(.leaf):hover { background:var(--line2); color:var(--ink); }
+.dep-caret.leaf { font-size:12px; opacity:.5; }
+.dep-caret:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
+.dep-count { flex:none; font-size:11px; font-weight:600; color:var(--muted); background:var(--card);
+             border:1px solid var(--line2); border-radius:980px; padding:1px 8px; }
+.dep-children { margin:1px 0 1px 11px; padding-left:11px; border-left:1.5px solid var(--line); }
+.dep-node.collapsed > .dep-children { display:none; }
+.dep-node.collapsed > .dep-row .dep-count { color:var(--accent); border-color:color-mix(in srgb, var(--accent) 32%, transparent); }
 .dep-empty { font-size:13px; color:var(--faint); padding:6px 2px; }
-.pill { font-size:10.5px; padding:3px 9px; border-radius:980px; color:var(--accent); background:var(--accent-soft); }
+.pill { flex:none; font-size:10.5px; padding:3px 9px; border-radius:980px; color:var(--accent); background:var(--accent-soft); }
 
 /* collapsible folds */
 .fold { border-top:1px solid var(--line); }
-.fold-head { display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; padding:14px 2px; }
-.fold-head:hover .fold-lbl { color:var(--ink); }
+.fold-head { display:flex; align-items:center; gap:9px; cursor:pointer; user-select:none; padding:16px 2px; }
+.fold-head .eyebrow { margin-bottom:0; }
+.fold-head:hover .eyebrow { color:var(--ink); }
 .fold-head .caret { color:var(--faint); width:10px; font-size:10px; }
-.fold-lbl { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--faint); }
 .fold[data-open="0"] .fold-body { display:none; }
-.fold-body { padding:2px 0 16px; }
-.hist { font-size:13px; line-height:1.6; color:var(--muted); border-left:2px solid var(--neu); padding:2px 0 2px 13px; }
-.hist .from { color:var(--ink2); }
+.fold-body { padding:4px 0 18px; }
+/* Revision history as a vertical timeline (d39): Now → each change → Created, with a connecting spine. */
+.rev-timeline { position:relative; padding:2px 0; }
+.rev-node { position:relative; padding:0 0 18px 28px; }
+.rev-node:last-child { padding-bottom:0; }
+.rev-node::before { content:''; position:absolute; left:9px; top:6px; height:100%; width:2px; background:var(--line2); }
+.rev-node:last-child::before { display:none; }
+.rev-dot { position:absolute; left:4px; top:4px; width:12px; height:12px; border-radius:50%; box-sizing:border-box;
+           background:var(--card); border:2px solid var(--line2); }
+.rev-now .rev-dot { background:var(--accent); border-color:var(--accent); }
+.rev-when { font-size:11.5px; color:var(--faint); font-variant-numeric:tabular-nums; margin-bottom:3px; }
+.rev-now .rev-when { color:var(--accent); font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
+.rev-state { font-size:14px; font-weight:600; color:var(--ink); }
+.rev-now .rev-state { color:var(--accent); }
+.rev-reason { font-size:13.5px; line-height:1.55; color:var(--ink2); }
+.rev-from { font-size:12.5px; color:var(--muted); margin-top:3px; }
+.rev-body { transition:background .2s; }
+.rev-node.rev-hit .rev-body { background:var(--accent-soft); border-radius:8px; padding:8px 11px; margin:-8px -11px 0; }
+.tr-empty { font-size:12.5px; color:var(--faint); }
 .tr-empty { font-size:12.5px; color:var(--faint); }
 
 /* options-compared matrix */
@@ -349,11 +448,15 @@ INDEX_HTML = r'''<!DOCTYPE html>
 </script>
 </head>
 <body>
-<div class="topbtns">
-  <button class="iconbtn" id="theme" title="Toggle light/dark">&#9728;</button>
-  <button class="iconbtn" id="help" title="Keyboard shortcuts (Cmd+?)">?</button>
-</div>
 <main>
+  <header class="topbar">
+    <span class="topbar-brand">Decision Explorer</span>
+    <nav class="topbar-right" aria-label="Top">
+      <a class="topbar-cta" id="templateLink" href="https://github.com/JustKaylaThings/Decision-Explorer" target="_blank" rel="noopener">Get the free template</a>
+      <button class="iconbtn" id="theme" title="Toggle light/dark">&#9728;</button>
+      <button class="iconbtn" id="help" title="Keyboard shortcuts (Cmd+?)">?</button>
+    </nav>
+  </header>
   <section class="hero">
     <div class="hero-name">
       <img class="app-icon hero-icon" alt="" hidden>
@@ -367,11 +470,14 @@ INDEX_HTML = r'''<!DOCTYPE html>
       <input id="search" type="search" placeholder="Search decisions">
     </div>
     <div class="tb-right">
-      <div class="seg" id="sort" role="group" aria-label="Sort decisions">
-        <span class="seg-lbl">Sort</span>
-        <button class="tab" data-sort="recent">Recent</button>
-              <button class="tab active" data-sort="phase">By phase</button>
-</div>
+      <div class="sort-wrap" id="sortWrap">
+        <button class="sort-btn" id="sortBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Sort decisions">
+          <span class="seg-lbl">Sort</span>
+          <span class="sort-cur" id="sortCur">Recent</span>
+          <svg class="sort-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="sort-menu" id="sortMenu" role="listbox"></div>
+      </div>
       <div class="filter-wrap">
         <button class="filter-btn" id="filterBtn" title="Filter" aria-haspopup="dialog" aria-expanded="false">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="7" y1="12" x2="17" y2="12"></line><line x1="10" y1="17" x2="14" y2="17"></line></svg>
@@ -391,6 +497,16 @@ INDEX_HTML = r'''<!DOCTYPE html>
   </div>
   <div id="list"></div>
 </main>
+<footer class="site-foot">
+  <span class="foot-credit">Decision Explorer &middot; Made by <strong>Kayla Jones</strong></span>
+  <nav class="foot-links" aria-label="Links">
+    <a href="https://github.com/JustKaylaThings" target="_blank" rel="noopener">GitHub</a>
+    <span class="foot-dot" aria-hidden="true">&middot;</span>
+    <a href="https://www.linkedin.com/in/kaylamichjones/" target="_blank" rel="noopener">LinkedIn</a>
+    <span class="foot-dot" aria-hidden="true">&middot;</span>
+    <a href="https://kayjo.co" target="_blank" rel="noopener">Website</a>
+  </nav>
+</footer>
 <div id="filterDrawer" class="drawer" role="dialog" aria-modal="true" aria-label="Filter decisions">
   <aside class="drawer-card">
     <header class="drawer-head">
@@ -443,6 +559,13 @@ function fmtDate(s, withTime){
   if (withTime && m[4]) out += ' · ' + m[4] + ':' + m[5];
   return out;
 }
+function fmtTime(s){  // time-only "13:12", or '' when the stamp carries no time
+  const m = String(s||'').match(/[T ](\d{2}):(\d{2})/);
+  return m ? m[1] + ':' + m[2] : '';
+}
+// What a card/row shows in its date slot: the time alone in the "Last 24 hours" bucket (where the
+// day is a given), otherwise the date; falls back to the date if no time was stamped (d38 stream).
+function cardDate(s, time){ return time ? (fmtTime(s) || fmtDate(s, false)) : fmtDate(s, false); }
 // Last activity = the most recent of the decision's own date and any revision dates.
 const lastActivity = d => {
   let m = d.date || '';
@@ -456,30 +579,49 @@ const PHASE_C = { Requirements:'#5b9bd5', Design:'#9b87d4', Implementation:'#35b
 const phaseOf = d => d.phase || 'Unphased';
 const phaseColor = p => PHASE_C[p] || '#8e8e93';
 const areaOf = d => d.area || '';
+const versionOf = d => d.version || '';
+// Compare version strings newest-first: numeric dotted parts (1.10 > 1.9), text falls back to locale.
+function cmpVersion(a, b){
+  const pa = String(a).split(/[.\-]/), pb = String(b).split(/[.\-]/);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++){
+    const na = parseInt(pa[i], 10), nb = parseInt(pb[i], 10);
+    const bothNum = !isNaN(na) && !isNaN(nb);
+    if (bothNum){ if (na !== nb) return nb - na; }
+    else { const c = (pb[i]||'').localeCompare(pa[i]||''); if (c) return c; }
+  }
+  return 0;
+}
 function orderPhases(present){
   return PHASE_ORDER.filter(p => present.includes(p))
     .concat(present.filter(p => !PHASE_ORDER.includes(p)).sort());
 }
 function matches(d, f){
   if (!f) return true;
-  const hay = [d.title, d.phase, d.category, d.rationale, d.question,
+  const hay = [d.title, d.phase, d.category, d.version, d.rationale, d.question,
     (d.options||[]).map(o => o.label + ' ' + (o.tradeoffs||[]).map(t => t.criterion + ' ' + (t.note||'')).join(' ')).join(' ')
   ].join(' ').toLowerCase();
   return hay.includes(f.toLowerCase());
 }
 
 let activeId = null;          // the decision shown in the open sheet, or null
-let sortMode = 'phase';
+let sortMode = 'recent';      // default view: newest-activity first (the "what changed lately" question)
 let filter = '';
 let openOnly = false;
+let builtOnly = false;        // isolate just the decided-but-not-built decisions (d43)
 let areaFilter = '';
+let verFilter = '';           // selected app version; '' = all
 let catFilter = new Set();    // selected categories (multi-select); empty = all
 let collapsed = new Set();    // section names folded shut in the list (persists across re-renders)
 let viewMode = (function(){ try { return localStorage.getItem('dt-view')==='list' ? 'list' : 'cards'; } catch(e){ return 'cards'; } })();
 
 const isOpen = d => d.status === 'open';
+// Decided but not yet built into the app: an optional flag, kept separate from open/decided so a
+// decided decision can still be marked unshipped (d43). Absent or true → built; only built===false
+// marks it unbuilt, so the surfaces below stay dormant for projects that never set it.
+const isUnbuilt = d => d.built === false;
 const passes = d => matches(d, filter)
   && (!areaFilter || areaOf(d) === areaFilter)
+  && (!verFilter || versionOf(d) === verFilter)
   && (!catFilter.size || catFilter.has(d.category || ''));
 function byRecency(a, b){
   const da = lastActivity(a), db = lastActivity(b);
@@ -492,55 +634,122 @@ function setHeader(){
   const t = document.getElementById('title'); if (t) t.textContent = PROJECT;
   const ht = document.getElementById('heroTitle'); if (ht) ht.textContent = PROJECT;
   document.title = PROJECT + ' — Decision Explorer';
+  // Count every decision-event: each logged decision plus each revision is a decision that was made,
+  // so the headline reflects the true total, not just the created count (d38).
+  const logged = RAW.length;
+  const revisions = RAW.reduce((n, d) => n + ((d.history || []).length), 0);
+  const made = logged + revisions;
   const openN = RAW.filter(isOpen).length;
+  const unbuiltN = RAW.filter(isUnbuilt).length;
   const hs = document.getElementById('heroSub');
-  if (hs) hs.textContent = RAW.length
-    ? RAW.length + ' decision' + (RAW.length===1?'':'s') + (openN ? ' · ' + openN + ' still open' : '')
-    : 'No decisions logged yet';
+  if (!hs) return;
+  if (!logged){ hs.textContent = 'No decisions logged yet'; return; }
+  const parts = [logged + ' created'];
+  if (revisions) parts.push(revisions + ' revision' + (revisions===1?'':'s'));
+  if (openN) parts.push(openN + ' open');
+  if (unbuiltN) parts.push(unbuiltN + ' not built');
+  hs.innerHTML = `<span class="hero-count">${made} decision${made===1?'':'s'} made</span><span class="hero-break">${parts.join(' · ')}</span>`;
 }
 
 // ---- cards ----
-function cardHTML(d){
+// cardHTML/rowHTML take an optional opts: { date } overrides the shown date (the Recent
+// event stream dates a decision card at its creation, not last-activity); { hideRev } drops the
+// "revised" badge there, since each revision is now its own card (d38).
+function cardHTML(d, opts){
+  opts = opts || {};
   const p = phaseOf(d), ch = chosenOf(d), pc = phaseColor(p);
-  const rev = d.history && d.history.length ? '<span class="card-rev">revised</span>' : '';
-  const shown = lastActivity(d);  // card shows the last-revised date (created date lives in the sheet)
-  return `<article class="dt-item card${isOpen(d)?' is-open':''}" data-id="${esc(d.id)}" tabindex="0">
+  const rev = (!opts.hideRev && d.history && d.history.length) ? '<span class="card-rev">revised</span>' : '';
+  const build = isUnbuilt(d) ? '<span class="card-build">Not built yet</span>' : '';
+  const shown = ('date' in opts) ? opts.date : lastActivity(d);
+  return `<article class="dt-item card${isOpen(d)?' is-open':''}${isUnbuilt(d)?' is-unbuilt':''}" data-id="${esc(d.id)}" tabindex="0">
     <div class="card-head">
       <span class="phase-pill" style="color:${pc};background:${pc}22">${esc(p)}</span>
-      ${shown?`<span class="card-date">${fmtDate(shown,false)}</span>`:''}
+      <span class="card-id">${esc(d.id)}</span>
+      ${shown?`<span class="card-date">${cardDate(shown,opts.time)}</span>`:''}
     </div>
     <h3 class="card-title">${esc(d.title)}</h3>
     <div class="card-chosen${ch?'':' open'}">${ch?'✓ '+esc(ch.label):'Open — undecided'}</div>
     ${d.rationale?`<p class="card-why">${esc(d.rationale)}</p>`:''}
-    <div class="card-foot">${d.category?`<span class="card-cat">${esc(d.category)}</span>`:''}${rev}</div>
+    <div class="card-foot">${build}${d.category?`<span class="card-cat">${esc(d.category)}</span>`:''}${versionOf(d)?`<span class="card-ver">v${esc(versionOf(d))}</span>`:''}${rev}</div>
   </article>`;
 }
-function rowHTML(d){
+function rowHTML(d, opts){
+  opts = opts || {};
   const p = phaseOf(d), ch = chosenOf(d), pc = phaseColor(p);
-  const rev = d.history && d.history.length ? '<span class="row-rev">revised</span>' : '';
-  const shown = lastActivity(d);  // row shows the last-revised date (created date lives in the sheet)
-  return `<div class="dt-item row${isOpen(d)?' is-open':''}" data-id="${esc(d.id)}" tabindex="0">
+  const rev = (!opts.hideRev && d.history && d.history.length) ? '<span class="row-rev">revised</span>' : '';
+  const build = isUnbuilt(d) ? '<span class="row-build">Not built</span>' : '';
+  const shown = ('date' in opts) ? opts.date : lastActivity(d);
+  return `<div class="dt-item row${isOpen(d)?' is-open':''}${isUnbuilt(d)?' is-unbuilt':''}" data-id="${esc(d.id)}" tabindex="0">
     <span class="row-dot" style="background:${pc}"></span>
+    <span class="row-id">${esc(d.id)}</span>
     <div class="row-main">
       <span class="row-title">${esc(d.title)}</span>
       <span class="row-chosen${ch?'':' open'}">${ch?'✓ '+esc(ch.label):'Open — undecided'}</span>
     </div>
-    ${d.category?`<span class="row-cat">${esc(d.category)}</span>`:''}${rev}
-    ${shown?`<span class="row-date">${fmtDate(shown,false)}</span>`:''}
+    ${build}${d.category?`<span class="row-cat">${esc(d.category)}</span>`:''}${versionOf(d)?`<span class="row-ver">v${esc(versionOf(d))}</span>`:''}${rev}
+    ${shown?`<span class="row-date">${cardDate(shown,opts.time)}</span>`:''}
     <span class="row-arrow">›</span>
   </div>`;
 }
-function sectionHTML(name, color, items, pinned){
+// A revision shown as its own slim card in the Recent stream, linking back to its parent
+// decision and opening straight to the revision-history fold (d38).
+function revCardHTML(d, h, hi, time){
+  return `<article class="dt-item card revcard" data-id="${esc(d.id)}" data-openfold="history" data-revidx="${hi}" tabindex="0">
+    <div class="card-head">
+      <span class="revcard-kind">↻ Revision</span>
+      <span class="card-id">${esc(d.id)}</span>
+      ${h.date?`<span class="card-date">${cardDate(h.date,time)}</span>`:''}
+    </div>
+    <h3 class="card-title">${esc(d.title)}</h3>
+    <p class="card-why">${esc(h.reason || (h.from?'was “'+h.from+'”':''))}</p>
+    <div class="card-foot"><span class="revcard-link">See in timeline ›</span></div>
+  </article>`;
+}
+function revRowHTML(d, h, hi, time){
+  const p = phaseOf(d), pc = phaseColor(p);
+  return `<div class="dt-item row revrow" data-id="${esc(d.id)}" data-openfold="history" data-revidx="${hi}" tabindex="0">
+    <span class="row-dot" style="background:${pc}"></span>
+    <span class="row-id">${esc(d.id)}</span>
+    <div class="row-main">
+      <span class="row-title"><span class="revrow-kind">↻ Revision</span>${esc(d.title)}</span>
+      <span class="row-chosen">${esc(h.reason || (h.from?'was “'+h.from+'”':''))}</span>
+    </div>
+    ${h.date?`<span class="row-date">${cardDate(h.date,time)}</span>`:''}
+    <span class="row-arrow">›</span>
+  </div>`;
+}
+// Revision history as a vertical timeline (d39): Now (current state) at top, each change below it
+// newest-first with its reason and the state it moved away from, down to Created at the bottom.
+function revTimeline(d){
+  const ch = chosenOf(d), hist = d.history || [];
+  let h = '<div class="rev-timeline">';
+  h += `<div class="rev-node rev-now"><span class="rev-dot"></span><div class="rev-body">
+    <div class="rev-when">Now</div>
+    <div class="rev-state">${ch?'✓ '+esc(ch.label):'Open — undecided'}</div></div></div>`;
+  for (let i = hist.length - 1; i >= 0; i--){
+    const x = hist[i];
+    h += `<div class="rev-node" data-rev="${i}"><span class="rev-dot"></span><div class="rev-body">
+      <div class="rev-when">${x.date?fmtDate(x.date,true):'—'}</div>
+      ${x.reason?`<div class="rev-reason">${esc(x.reason)}</div>`:''}
+      ${x.from?`<div class="rev-from">was “${esc(x.from)}”</div>`:''}</div></div>`;
+  }
+  h += `<div class="rev-node rev-created"><span class="rev-dot"></span><div class="rev-body">
+    <div class="rev-when">Created${d.date?' · '+fmtDate(d.date,true):''}</div></div></div>`;
+  return h + '</div>';
+}
+function sectionWrap(name, color, innerCards, count, pinned){
   const isCol = collapsed.has(name);
-  const inner = viewMode === 'list'
-    ? `<div class="dlist">${items.map(rowHTML).join('')}</div>`
-    : `<div class="grid">${items.map(cardHTML).join('')}</div>`;
-  return `<section class="phase-sec${pinned?' pinned':''}${isCol?' collapsed':''}">
+  const inner = viewMode === 'list' ? `<div class="dlist">${innerCards}</div>` : `<div class="grid">${innerCards}</div>`;
+  return `<section class="phase-sec${pinned?' '+pinned:''}${isCol?' collapsed':''}">
     <header class="sec-head" data-sec="${esc(name)}" role="button" tabindex="0" aria-expanded="${isCol?'false':'true'}">
       <span class="sec-caret" aria-hidden="true">▾</span><span class="sec-dot" style="background:${color}"></span>
-      <h2 class="sec-name">${esc(name)} (${items.length})</h2></header>
+      <h2 class="sec-name">${esc(name)} (${count})</h2></header>
     <div class="sec-body">${inner}</div>
   </section>`;
+}
+function sectionHTML(name, color, items, pinned){
+  const cards = items.map(d => viewMode === 'list' ? rowHTML(d) : cardHTML(d)).join('');
+  return sectionWrap(name, color, cards, items.length, pinned);
 }
 function toggleSection(name){ collapsed.has(name) ? collapsed.delete(name) : collapsed.add(name); buildList(); }
 
@@ -548,10 +757,13 @@ function toggleSection(name){ collapsed.has(name) ? collapsed.delete(name) : col
 function renderFilters(){
   const pop = document.getElementById('filterPop');
   const openN = RAW.filter(isOpen).length;
+  const unbuiltN = RAW.filter(isUnbuilt).length;
   let h = '';
-  if (openN){
-    h += `<div class="fp-sec"><div class="fp-h">Show</div>
-      <button class="fp-opt${openOnly?' on':''}" data-toggle="open"><span class="fp-check">✓</span>Open decisions only<span class="fp-n">${openN}</span></button></div>`;
+  if (openN || unbuiltN){
+    h += `<div class="fp-sec"><div class="fp-h">Show</div>`;
+    if (openN) h += `<button class="fp-opt${openOnly?' on':''}" data-toggle="open"><span class="fp-check">✓</span>Open decisions only<span class="fp-n">${openN}</span></button>`;
+    if (unbuiltN) h += `<button class="fp-opt${builtOnly?' on':''}" data-toggle="built"><span class="fp-check">✓</span>Not built yet only<span class="fp-n">${unbuiltN}</span></button>`;
+    h += `</div>`;
   }
   if (AXIS){
     const vals = [...new Set(RAW.map(areaOf).filter(Boolean))].sort();
@@ -562,6 +774,16 @@ function renderFilters(){
         + `</div>`;
     }
   }
+  const vers = [...new Set(RAW.map(versionOf).filter(Boolean))].sort(cmpVersion);
+  if (vers.length){
+    h += `<div class="fp-sec"><div class="fp-h">Version</div>
+      <button class="fp-opt${!verFilter?' on':''}" data-ver=""><span class="fp-check">✓</span>All</button>`
+      + vers.map(v => {
+          const n = RAW.filter(d => versionOf(d) === v).length;
+          return `<button class="fp-opt${verFilter===v?' on':''}" data-ver="${esc(v)}"><span class="fp-check">✓</span>v${esc(v)}<span class="fp-n">${n}</span></button>`;
+        }).join('')
+      + `</div>`;
+  }
   const cats = [...new Set(RAW.map(d => d.category).filter(Boolean))].sort();
   if (cats.length){
     h += `<div class="fp-sec"><div class="fp-h">Category</div>`
@@ -571,7 +793,7 @@ function renderFilters(){
         }).join('')
       + `</div>`;
   }
-  const active = (openOnly?1:0) + (areaFilter?1:0) + catFilter.size;
+  const active = (openOnly?1:0) + (builtOnly?1:0) + (areaFilter?1:0) + (verFilter?1:0) + catFilter.size;
   pop.innerHTML = h || '<div class="fp-sec"><div class="fp-h">No filters available</div></div>';
   const foot = document.getElementById('filterFoot');      // pinned footer: always visible, never scrolls away
   if (foot){
@@ -589,26 +811,70 @@ function buildList(){
   renderFilters();
   if (!RAW.length){ root.innerHTML = '<div class="empty-state">No decisions logged yet.<br>Use <code>/decision-tree add</code>.</div>'; return; }
 
-  if (openOnly){
-    const items = RAW.filter(d => isOpen(d) && passes(d)).sort(byRecency);
-    root.innerHTML = items.length ? sectionHTML('Needs deciding', 'var(--neg)', items, true)
-      : '<div class="empty-state">No open decisions'+(filter?' match “'+esc(filter)+'”':'')+'.</div>';
+  // Isolation mode: "open only" and/or "not built only" collapse the list to just those groups.
+  if (openOnly || builtOnly){
+    let only = '';
+    if (openOnly){
+      const items = RAW.filter(d => isOpen(d) && passes(d)).sort(byRecency);
+      if (items.length) only += sectionHTML('Open', 'var(--neg)', items, 'pinned');
+    }
+    if (builtOnly){
+      const items = RAW.filter(d => isUnbuilt(d) && passes(d)).sort(byRecency);
+      if (items.length) only += sectionHTML('Not built yet', 'var(--build)', items, 'pinned pinned-build');
+    }
+    const labels = [openOnly?'open':'', builtOnly?'unbuilt':''].filter(Boolean).join(' or ');
+    root.innerHTML = only || '<div class="empty-state">No '+labels+' decisions'+(filter?' match “'+esc(filter)+'”':'')+'.</div>';
     return;
   }
 
-  const pinned = RAW.filter(d => isOpen(d) && passes(d));
-  let html = pinned.length ? sectionHTML('Needs deciding', 'var(--neg)', pinned, true) : '';
+  // Pinned groups sit above the framework so what's unresolved (open, d13) or decided-but-unshipped
+  // (unbuilt, d43) is always in view; each hides when its group is empty.
+  const pinnedOpen = RAW.filter(d => isOpen(d) && passes(d));
+  const pinnedUnbuilt = RAW.filter(d => isUnbuilt(d) && passes(d));
+  let html = (pinnedOpen.length ? sectionHTML('Open', 'var(--neg)', pinnedOpen, 'pinned') : '')
+           + (pinnedUnbuilt.length ? sectionHTML('Not built yet', 'var(--build)', pinnedUnbuilt, 'pinned pinned-build') : '');
   let body = '';
 
   if (sortMode === 'recent'){
-    const items = RAW.filter(passes).sort(byRecency);
-    if (items.length) body = sectionHTML('Recent', 'var(--accent)', items, false);
+    // Recent is an event stream: each decision's creation AND each revision is its own card,
+    // so every decision-event is visible without opening the decision to read its history (d38).
+    // Revision cards link back to the parent decision and open straight to its history fold.
+    // Events split into age buckets relative to when the page is open, each with its own count.
+    const events = [];
+    RAW.filter(passes).forEach(d => {
+      events.push({ date: d.date || '', html: (t) => viewMode === 'list' ? rowHTML(d, {date:d.date, hideRev:true, time:t}) : cardHTML(d, {date:d.date, hideRev:true, time:t}) });
+      (d.history || []).forEach((h, hi) => {
+        events.push({ date: h.date || '', html: (t) => viewMode === 'list' ? revRowHTML(d, h, hi, t) : revCardHTML(d, h, hi, t) });
+      });
+    });
+    if (events.length){
+      events.sort((a, b) => (b.date || '').localeCompare(a.date || ''));   // newest first; undated sink
+      const DAY = 86400000, now = Date.now();
+      const cuts = [['Last 24 hours', DAY], ['Last 7 days', 7*DAY], ['Last 30 days', 30*DAY], ['Earlier', Infinity]];
+      const groups = cuts.map(() => []);
+      events.forEach(ev => {
+        const t = ev.date ? new Date(ev.date).getTime() : NaN;
+        const age = isNaN(t) ? Infinity : now - t;        // undated → Infinity → falls to "Earlier"
+        let i = cuts.findIndex(([, c]) => age < c); if (i < 0) i = cuts.length - 1;
+        groups[i].push(ev);
+      });
+      cuts.forEach(([name], i) => {
+        if (groups[i].length) body += sectionWrap(name, 'var(--accent)', groups[i].map(ev => ev.html(i === 0)).join(''), groups[i].length, false);  // i===0 is "Last 24 hours" → show time (d38 stream)
+      });
+    }
   } else if (sortMode === 'area' && AXIS){
     const groups = {};
     RAW.forEach(d => { const a = areaOf(d) || 'Unassigned'; (groups[a] = groups[a] || []).push(d); });
     Object.keys(groups).sort((a,b) => a==='Unassigned'?1 : b==='Unassigned'?-1 : a.localeCompare(b)).forEach(a => {
       const items = groups[a].filter(passes);
       if (items.length) body += sectionHTML(a, 'var(--faint)', items, false);
+    });
+  } else if (sortMode === 'version'){
+    const groups = {};
+    RAW.forEach(d => { const v = versionOf(d) || 'Unversioned'; (groups[v] = groups[v] || []).push(d); });
+    Object.keys(groups).sort((a,b) => a==='Unversioned'?1 : b==='Unversioned'?-1 : cmpVersion(a,b)).forEach(v => {
+      const items = groups[v].filter(passes);
+      if (items.length) body += sectionHTML(v==='Unversioned'?v:'v'+v, 'var(--accent)', items, false);
     });
   } else {
     const groups = {};
@@ -654,56 +920,80 @@ function depRows(ids, dir){
       <span class="dep-name">${esc(dd.title)}</span>${dd.category?`<span class="pill">${esc(dd.category)}</span>`:''}</div>`;
   }).join('');
 }
-function downstreamCascade(rootId){
-  const out = [], visited = new Set([rootId]);
-  (function walk(id, depth){
+// Downstream impact as a loop-safe tree: each decision appears once, under the first parent
+// that reaches it. Parents are collapsed by default so only the direct dependents show.
+function downstreamTree(rootId){
+  const visited = new Set([rootId]);
+  return (function kids(id){
+    const out = [];
     RAW.filter(x => (x.dependsOn||[]).includes(id)).map(x => x.id).sort().forEach(k => {
-      if (visited.has(k)) return; visited.add(k); out.push({ id:k, depth }); walk(k, depth+1);
+      if (visited.has(k)) return;       // check at processing time so a node lands under one parent only
+      visited.add(k); out.push({ id:k, children:kids(k) });
     });
-  })(rootId, 0);
-  return out;
+    return out;
+  })(rootId);
 }
-function downRows(rows){
-  if (!rows.length) return `<div class="dep-empty">No downstream decisions</div>`;
-  return rows.map(({id, depth}) => {
-    const dd = RAW.find(x => x.id===id); if (!dd) return '';
-    return `<div class="dep-row${depth?' nested':''}" data-jump="${esc(id)}" style="padding-left:${2+depth*16}px">
-      <span class="dep-arrow">↓</span><span class="dep-name">${esc(dd.title)}</span>${dd.category?`<span class="pill">${esc(dd.category)}</span>`:''}</div>`;
-  }).join('');
+const descCount = node => node.children.reduce((n, c) => n + 1 + descCount(c), 0);
+const treeTotal = nodes => nodes.reduce((n, c) => n + 1 + descCount(c), 0);
+function downNode(node){
+  const dd = RAW.find(x => x.id===node.id); if (!dd) return '';
+  const has = node.children.length > 0, n = has ? descCount(node) : 0;
+  return `<div class="dep-node${has?' collapsed':''}">
+    <div class="dep-row" data-jump="${esc(node.id)}">
+      ${has ? `<span class="dep-caret" role="button" tabindex="0" aria-label="Expand">▸</span>`
+            : `<span class="dep-caret leaf">↓</span>`}
+      <span class="dep-name">${esc(dd.title)}</span>${dd.category?`<span class="pill">${esc(dd.category)}</span>`:''}
+      ${has?`<span class="dep-count">+${n}</span>`:''}
+    </div>${has?`<div class="dep-children">${node.children.map(downNode).join('')}</div>`:''}
+  </div>`;
+}
+function downRows(nodes){
+  if (!nodes.length) return `<div class="dep-empty">No downstream decisions</div>`;
+  return nodes.map(downNode).join('');
 }
 
 function sheetHTML(d){
   const ch = chosenOf(d), p = phaseOf(d);
-  const upstream = d.dependsOn || [], downCascade = downstreamCascade(d.id);
+  const upstream = d.dependsOn || [], downTree = downstreamTree(d.id), downTotal = treeTotal(downTree);
   const revised = d.history && d.history.length;
+  const meta = [d.category, (AXIS && d.area) ? d.area : '', d.version ? 'v'+d.version : '', d.date ? fmtDate(d.date,true) : '']
+    .filter(Boolean).map(m => `<span class="d-meta">${esc(m)}</span>`).join('');
   let h = `<button class="sheet-close" aria-label="Close">✕</button>`;
-  h += `<h2 class="d-title">${esc(d.title)}</h2>`;
-  h += `<div class="d-sub"><span class="pdot" style="background:${phaseColor(p)}"></span>
-    <span>${esc(p)}${d.category?' · '+esc(d.category):''}${(AXIS && d.area)?' · '+esc(d.area):''}${d.date?' · '+fmtDate(d.date,true):''}</span>
+  h += `<div class="d-eyebrow">
+    <span class="phase-chip" style="--pc:${phaseColor(p)}"><span class="pdot"></span>${esc(p)}</span>
+    <span class="d-id">${esc(d.id)}</span>
+    ${meta}
     ${d.status==='open'?'<span class="tag open">open</span>':''}
+    ${d.built===false?'<span class="tag unbuilt">not built yet</span>':''}
     ${revised?'<span class="tag revised" data-open-fold="history">revised</span>':''}</div>`;
-  h += `<div class="chosen-box${ch?'':' open'}">
-    <div class="chosen-cap">${ch?'✓ Chosen':'Status'}</div>
-    <div class="chosen-val">${ch?esc(ch.label):'Still open — no option chosen yet'}</div>
-    ${d.rationale?`<div class="why">${esc(d.rationale)}</div>`:''}
-    ${d.question?`<div class="why-q${d.rationale?' sep':''}">${esc(d.question)}</div>`:''}</div>`;
-  if (downCascade.length || upstream.length){
-    h += `<div class="section impact">`;
-    if (downCascade.length) h += `<div class="imp-grp"><div class="lbl">Affects${downCascade.length>1?` <span class="lbl-n">${downCascade.length} downstream</span>`:''}</div>${downRows(downCascade)}</div>`;
-    if (upstream.length)    h += `<div class="imp-grp"><div class="lbl">Depends on</div>${depRows(upstream,'up')}</div>`;
-    h += `</div>`;
+  h += `<h2 class="d-title">${esc(d.title)}</h2>`;
+  if (d.question) h += `<p class="d-question">${esc(d.question)}</p>`;
+  h += `<div class="answer${ch?'':' open'}${ch&&d.built===false?' unbuilt':''}">
+    <span class="answer-mark">${ch?'✓':'!'}</span>
+    <div>
+      <div class="answer-cap">${ch?(d.built===false?'Chosen · not built yet':'Chosen'):'Status'}</div>
+      <div class="answer-val">${ch?esc(ch.label):'Still open — no option chosen yet'}</div>
+      ${ch&&d.built===false?'<div class="answer-build">Decided, but not yet built into the app.</div>':''}
+    </div></div>`;
+  if (d.rationale)
+    h += `<section class="block"><div class="eyebrow">Why</div><p class="why-text">${esc(d.rationale)}</p></section>`;
+  if (downTotal || upstream.length){
+    h += `<section class="block impact">`;
+    if (downTotal) h += `<div class="imp-grp"><div class="eyebrow">Affects${downTotal>1?`<span class="eyebrow-n">${downTotal} downstream</span>`:''}</div>${downRows(downTree)}</div>`;
+    if (upstream.length)    h += `<div class="imp-grp"><div class="eyebrow">Depends on</div>${depRows(upstream,'up')}</div>`;
+    h += `</section>`;
   }
   const nopt = (d.options||[]).length;
-  h += `<section class="fold" data-open="1"><header class="fold-head"><span class="caret">▾</span><span class="fold-lbl">Options compared${nopt?` (${nopt})`:''}</span></header><div class="fold-body">${tradeoffMatrix(d)}</div></section>`;
+  h += `<section class="fold" data-open="1"><header class="fold-head"><span class="caret">▾</span><span class="eyebrow">Options compared${nopt?`<span class="eyebrow-n">${nopt}</span>`:''}</span></header><div class="fold-body">${tradeoffMatrix(d)}</div></section>`;
   if (revised)
-    h += `<section class="fold" data-open="0" data-fold="history"><header class="fold-head"><span class="caret">▸</span><span class="fold-lbl">Revision history (${d.history.length})</span></header><div class="fold-body"><div class="hist">${d.history.map(x => `was <span class="from">“${esc(x.from)}”</span> — ${esc(x.reason)}${x.date?' ('+fmtDate(x.date,true)+')':''}`).join('<br><br>')}</div></div></section>`;
+    h += `<section class="fold" data-open="0" data-fold="history"><header class="fold-head"><span class="caret">▸</span><span class="eyebrow">Revision history<span class="eyebrow-n">${d.history.length}</span></span></header><div class="fold-body">${revTimeline(d)}</div></section>`;
   return h;
 }
 
 // ---- sheet open / close ----
 const sheet = document.getElementById('sheet');
 const sheetBody = document.getElementById('sheetBody');
-function openSheet(id){
+function openSheet(id, openFold, revIdx){
   const d = RAW.find(x => x.id===id); if (!d) return;
   activeId = id;
   sheetBody.innerHTML = sheetHTML(d);
@@ -711,6 +1001,14 @@ function openSheet(id){
   sheet.classList.add('open');
   document.body.classList.add('no-scroll');
   if (decodeURIComponent((location.hash||'').replace(/^#/,'')) !== id) location.hash = encodeURIComponent(id);
+  if (openFold){  // a revision card opens straight to the history fold (d38)
+    const s = sheetBody.querySelector('.fold[data-fold="'+openFold+'"]');
+    if (s){ s.dataset.open = '1'; const c = s.querySelector('.caret'); if (c) c.textContent = '▾'; s.scrollIntoView({block:'nearest'}); }
+  }
+  if (revIdx != null && revIdx !== ''){  // highlight the exact change you clicked in the timeline (d39)
+    const node = sheetBody.querySelector('.rev-node[data-rev="'+revIdx+'"]');
+    if (node){ node.classList.add('rev-hit'); node.scrollIntoView({block:'nearest'}); }
+  }
 }
 function closeSheet(){
   sheet.classList.remove('open');
@@ -724,12 +1022,12 @@ const selectDecision = openSheet;  // alias
 document.getElementById('list').addEventListener('click', e => {
   const head = e.target.closest('.sec-head');
   if (head){ toggleSection(head.dataset.sec); return; }
-  const it = e.target.closest('.dt-item'); if (it) openSheet(it.dataset.id);
+  const it = e.target.closest('.dt-item'); if (it) openSheet(it.dataset.id, it.dataset.openfold, it.dataset.revidx);
 });
 document.getElementById('list').addEventListener('keydown', e => {
   const head = e.target.closest('.sec-head');
   if (head && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); toggleSection(head.dataset.sec); return; }
-  if (e.key === 'Enter'){ const it = e.target.closest('.dt-item'); if (it){ e.preventDefault(); openSheet(it.dataset.id); } }
+  if (e.key === 'Enter'){ const it = e.target.closest('.dt-item'); if (it){ e.preventDefault(); openSheet(it.dataset.id, it.dataset.openfold, it.dataset.revidx); } }
 });
 sheet.addEventListener('click', e => {
   if (e.target === sheet || e.target.closest('.sheet-close')){ closeSheet(); return; }
@@ -739,6 +1037,9 @@ sheet.addEventListener('click', e => {
   const badge = e.target.closest('[data-open-fold]');
   if (badge){ const s = sheet.querySelector('.fold[data-fold="'+badge.dataset.openFold+'"]');
     if (s){ s.dataset.open='1'; const c = s.querySelector('.caret'); if (c) c.textContent='▾'; s.scrollIntoView({block:'nearest'}); } return; }
+  const car = e.target.closest('.dep-caret:not(.leaf)');
+  if (car){ const node = car.closest('.dep-node'); const open = node.classList.toggle('collapsed')===false;
+    car.textContent = open?'▾':'▸'; car.setAttribute('aria-label', open?'Collapse':'Expand'); return; }
   const j = e.target.closest('[data-jump]');
   if (j){ openSheet(j.dataset.jump); }
 });
@@ -764,19 +1065,46 @@ filterDrawer.addEventListener('click', e => {
   const opt = e.target.closest('.fp-opt');
   if (opt){
     if (opt.dataset.toggle === 'open') openOnly = !openOnly;
+    else if (opt.dataset.toggle === 'built') builtOnly = !builtOnly;
     else if (opt.hasAttribute('data-area')) areaFilter = opt.dataset.area;
+    else if (opt.hasAttribute('data-ver')) verFilter = opt.dataset.ver;
     else if (opt.hasAttribute('data-cat')){ const c = opt.dataset.cat; catFilter.has(c) ? catFilter.delete(c) : catFilter.add(c); }
     buildList();  // re-renders the drawer (renderFilters) so checks/badge update; stays open
     return;
   }
-  if (e.target.closest('#clearFilters')){ openOnly = false; areaFilter = ''; catFilter.clear(); buildList(); }
+  if (e.target.closest('#clearFilters')){ openOnly = false; builtOnly = false; areaFilter = ''; verFilter = ''; catFilter.clear(); buildList(); }
 });
-document.getElementById('sort').addEventListener('click', e => {
-  const b = e.target.closest('.tab'); if (!b) return;
+// Sort dropdown: a single button that opens a popover menu of grouping modes (d30 revised).
+// The mode list is dynamic — "By <axis>" and "By version" appear only when they apply.
+const sortWrap = document.getElementById('sortWrap');
+const sortBtn = document.getElementById('sortBtn');
+function sortOptions(){
+  const opts = [['recent', 'Recent'], ['phase', 'By phase']];
+  if (AXIS) opts.push(['area', 'By ' + AXIS]);
+  if (RAW.some(versionOf)) opts.push(['version', 'By version']);
+  return opts;
+}
+function buildSortMenu(){
+  const opts = sortOptions();
+  document.getElementById('sortMenu').innerHTML = opts.map(([v, l]) =>
+    `<button class="sort-opt${v===sortMode?' on':''}" role="option" aria-selected="${v===sortMode}" data-sort="${v}"><span class="sort-check">✓</span>${esc(l)}</button>`
+  ).join('');
+  const cur = opts.find(([v]) => v === sortMode) || opts[0];
+  document.getElementById('sortCur').textContent = cur[1];
+}
+function closeSortMenu(){ sortWrap.classList.remove('open'); sortBtn.setAttribute('aria-expanded', 'false'); }
+sortBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  const open = sortWrap.classList.toggle('open');
+  sortBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+document.getElementById('sortMenu').addEventListener('click', e => {
+  const b = e.target.closest('.sort-opt'); if (!b) return;
   sortMode = b.dataset.sort;
-  document.querySelectorAll('#sort .tab').forEach(x => x.classList.toggle('active', x===b));
-  buildList();
+  closeSortMenu(); buildSortMenu(); buildList();
 });
+document.addEventListener('click', e => { if (!sortWrap.contains(e.target)) closeSortMenu(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSortMenu(); });
 // Show the app icon (in the top bar and the hero) when one is present in the folder.
 // Tries the _project.json "icon" first, then common filenames; stays hidden if none load.
 function resolveAppIcon(preferred){
@@ -841,7 +1169,7 @@ async function loadData(){
   const decisions = (await Promise.all(
     names.map(n => fetch(n).then(r => r.ok ? r.json() : null).catch(() => null))
   )).filter(Boolean);
-  return { project: proj.project || 'Decisions', axis: proj.secondaryAxis || '', icon: proj.icon || '', decisions, expected: names.length };
+  return { project: proj.project || 'Decisions', axis: proj.secondaryAxis || '', icon: proj.icon || '', hideTemplateLink: !!proj.hideTemplateLink, decisions, expected: names.length };
 }
 function showLoadError(){
   const hs = document.getElementById('heroSub'); if (hs) hs.textContent = '';
@@ -859,11 +1187,10 @@ async function init(){
   PROJECT = data.project; AXIS = data.axis; RAW = data.decisions;
   setHeader();
   resolveAppIcon(data.icon);
-  if (AXIS){  // second-dimension grouping ("By <label>") when the project defines one (d26)
-    const b = document.createElement('button');
-    b.className = 'tab'; b.dataset.sort = 'area'; b.textContent = 'By ' + AXIS;
-    document.getElementById('sort').appendChild(b);
-  }
+  // Let a cloned project hide the "Get the free template" promo via _project.json (d51).
+  if (data.hideTemplateLink){ const tl = document.getElementById('templateLink'); if (tl) tl.remove(); }
+  // Build the Sort menu — "By <axis>" (d26) and "By version" (d36) entries appear only when they apply.
+  buildSortMenu();
   buildList();
   const fromHash = decisionFromHash();
   if (fromHash) openSheet(fromHash);
@@ -886,6 +1213,10 @@ document.getElementById('help').addEventListener('click', () => toggleHelp());
 document.addEventListener('keydown', e => {
   if ((e.metaKey || e.ctrlKey) && (e.key === '?' || e.key === '/')){ e.preventDefault(); toggleHelp(); return; }
   if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const car = e.target.closest && e.target.closest('.dep-caret:not(.leaf)');
+  if (car && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault();
+    const node = car.closest('.dep-node'), open = node.classList.toggle('collapsed')===false;
+    car.textContent = open?'▾':'▸'; car.setAttribute('aria-label', open?'Collapse':'Expand'); return; }
   const tag = (e.target.tagName || '').toLowerCase();
   if (tag === 'input' || tag === 'textarea'){
     if (e.key === 'Escape'){ if (search.value){ search.value=''; filter=''; buildList(); } search.blur(); }
