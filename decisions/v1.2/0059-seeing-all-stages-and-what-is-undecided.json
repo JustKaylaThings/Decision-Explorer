@@ -1,0 +1,42 @@
+{
+  "id": "d59",
+  "title": "Seeing all stages and what's undecided",
+  "phase": "Design",
+  "category": "Visualization",
+  "version": "1.2",
+  "date": "2026-06-27T11:21:24",
+  "type": "general",
+  "question": "How do we show the whole SDLC at a glance, including stages with no decisions yet?",
+  "status": "decided",
+  "rationale": "A slim rail under the hero shows all six lifecycle stages in order with their counts and doubles as a jump-to-stage nav. Empty stages render muted as \"none yet\", so coverage gaps show without a separate panel — the review-first way to surface what hasn't been decided.",
+  "dependsOn": ["d6", "d13", "d58"],
+  "options": [
+    {
+      "id": "o59a",
+      "label": "One rail: stages + counts + jump nav, empty = \"none yet\"",
+      "chosen": true,
+      "note": "A single band combines the SDLC spine, per-stage counts, click-to-jump, and the coverage cue (empty stages muted).",
+      "tradeoffs": [
+        { "criterion": "fits the goal", "sentiment": "+", "note": "surfaces gaps and the lifecycle arc without hunting" },
+        { "criterion": "one calm element", "sentiment": "+", "note": "nav and coverage in a single band, not two competing surfaces" },
+        { "criterion": "build effort", "sentiment": "~", "note": "modest — one component, jump + scroll wiring" }
+      ]
+    },
+    {
+      "id": "o59b",
+      "label": "A separate coverage callout, no nav",
+      "tradeoffs": [
+        { "criterion": "fits the goal", "sentiment": "~", "note": "shows gaps but adds nothing for navigation" },
+        { "criterion": "one calm element", "sentiment": "-", "note": "another box to place and maintain — more clutter" }
+      ]
+    },
+    {
+      "id": "o59c",
+      "label": "Only show stages that have decisions",
+      "tradeoffs": [
+        { "criterion": "fits the goal", "sentiment": "-", "note": "hides the empty stages — which is exactly the coverage signal we want" },
+        { "criterion": "one calm element", "sentiment": "+", "note": "nothing extra, but it defeats the purpose" }
+      ]
+    }
+  ]
+}
