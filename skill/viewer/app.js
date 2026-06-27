@@ -124,6 +124,39 @@ function setHeader(){
   hs.innerHTML = `<span class="hero-count">${made} decision${made===1?'':'s'} made</span><span class="hero-break">${parts.join(' · ')}</span>`;
 }
 
+// ---- phase rail (the SDLC spine + coverage cue, d59) ----
+// All six lifecycle stages in order with their counts, doubling as a jump nav. A stage with no
+// decisions renders muted as "none yet", so what hasn't been decided is visible without hunting.
+function renderPhaseRail(){
+  const rail = document.getElementById('phaserail'); if (!rail) return;
+  if (!RAW.length){ rail.hidden = true; rail.innerHTML = ''; return; }
+  const counts = {};
+  RAW.forEach(d => { const p = phaseOf(d); if (PHASE_ORDER.includes(p)) counts[p] = (counts[p]||0) + 1; });
+  rail.hidden = false;
+  rail.innerHTML = PHASE_ORDER.map(p => {
+    const n = counts[p] || 0, empty = !n;
+    return `<button class="rail-step${empty?' empty':''}" style="--pc:${phaseColor(p)}"${empty?' tabindex="-1" aria-disabled="true"':` data-phase="${esc(p)}"`}>
+      <span class="rail-dot"></span><span class="rail-name">${esc(p)}</span>
+      <span class="rail-n">${empty?'none yet':n}</span>
+    </button>`;
+  }).join('<span class="rail-sep" aria-hidden="true"></span>');
+}
+// Scroll a phase section under the sticky toolbar (so its header isn't hidden behind it).
+function scrollToSection(name){
+  const head = document.querySelector('.sec-head[data-sec="' + name.replace(/"/g, '\\"') + '"]');
+  if (!head) return;
+  const tb = document.querySelector('.toolbar');
+  const y = head.getBoundingClientRect().top + window.scrollY - ((tb ? tb.offsetHeight : 0) + 16);
+  window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+}
+function jumpToPhase(p){
+  openOnly = builtOnly = dueOnly = false;   // isolation views hide the phase framework; clear so the section shows
+  collapsed.delete(p);                       // make sure the target stage isn't folded shut
+  if (sortMode !== 'phase'){ sortMode = 'phase'; buildSortMenu(); }
+  buildList();
+  requestAnimationFrame(() => scrollToSection(p));
+}
+
 // ---- cards ----
 // cardHTML/rowHTML take an optional opts: { date } overrides the shown date (the Recent
 // event stream dates a decision card at its creation, not last-activity); { hideRev } drops the
@@ -523,6 +556,9 @@ document.getElementById('list').addEventListener('click', e => {
   if (head){ toggleSection(head.dataset.sec); return; }
   const it = e.target.closest('.dt-item'); if (it) openSheet(it.dataset.id, it.dataset.openfold, it.dataset.revidx);
 });
+document.getElementById('phaserail').addEventListener('click', e => {
+  const step = e.target.closest('.rail-step[data-phase]'); if (step) jumpToPhase(step.dataset.phase);
+});
 document.getElementById('list').addEventListener('keydown', e => {
   const head = e.target.closest('.sec-head');
   if (head && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); toggleSection(head.dataset.sec); return; }
@@ -686,6 +722,7 @@ async function init(){
   if (data.expected > 0 && data.decisions.length === 0){ showLoadError(); return; }
   PROJECT = data.project; AXIS = data.axis; RAW = data.decisions;
   setHeader();
+  renderPhaseRail();
   resolveAppIcon(data.icon);
   // Let a cloned project hide the "Get the free template" promo via _project.json (d51).
   if (data.hideTemplateLink){ const tl = document.getElementById('templateLink'); if (tl) tl.remove(); }
