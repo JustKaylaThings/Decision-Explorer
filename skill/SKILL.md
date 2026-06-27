@@ -142,6 +142,13 @@ user — **do not write anything**. Run the read → weigh → place → brief w
 that already has decisions, consult the log first and surface what's relevant. The briefing is
 advisory; capture a new decision via `add` only if the user then actually decides to build it.
 
+### `starters [phase]` — work a stage's common decisions
+Surface the curated starter decisions for an SDLC phase so the user can decide the ones that apply.
+**Coverage-aware** (hides a starter once that phase has a decision covering it) and
+**capture-at-the-moment** (answering one runs the normal `add` flow → a decided decision; skips write
+nothing). With no `phase`, walk all six in lifecycle order. Run the read → hide → offer → capture
+workflow in **[starters.md](starters.md)**.
+
 ### `view` — (re)generate and open
 - Regenerate, then tell the user the path to `decisions/graph.html` so they can open it in a browser.
 

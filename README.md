@@ -49,6 +49,7 @@ skill/                     the installable skill
 ├── generate.py            builds the viewer from the decision files
 ├── consulting.md          the "plan" flow (weigh a change against past decisions)
 ├── auditing.md            the "audit" flow (back-fill decisions from an existing codebase)
+├── starters.md            the "starters" flow (common decisions to make at each SDLC stage)
 ├── viewer/                the decision explorer (app.js, styles.css, index.html)
 ├── hooks/                 reconcile-decisions.py — optional Stop-hook backstop
 ├── examples/              three sample decisions the skill scaffolds into a fresh project
@@ -89,6 +90,8 @@ typed as `/decide` if you added the alias above):
   why, then writes it once you confirm)
 - `/decision-tree revise <id>` — record a change to a past decision (keeps the history)
 - `/decision-tree plan` — weigh a new feature against existing decisions before you build
+- `/decision-tree starters [phase]` — work through a stage's common decisions; it lists the ones you
+  haven't covered yet and you decide the ones that apply
 - `/decision-tree view` — (re)generate the viewer and get the path to open
 - `/decision-tree list` — a compact text summary
 
@@ -208,6 +211,7 @@ improve the viewer or `SKILL.md`, re-copy them here before sharing:
 cp ~/.claude/skills/decision-tree/SKILL.md      skill/SKILL.md
 cp ~/.claude/skills/decision-tree/consulting.md skill/consulting.md
 cp ~/.claude/skills/decision-tree/auditing.md   skill/auditing.md
+cp ~/.claude/skills/decision-tree/starters.md   skill/starters.md
 cp ~/.claude/skills/decision-tree/generate.py   skill/generate.py
 cp ~/.claude/skills/decision-tree/viewer/*      skill/viewer/
 cp ~/.claude/skills/decide/SKILL.md             skill/decide/SKILL.md
