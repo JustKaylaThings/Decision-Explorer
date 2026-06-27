@@ -16,7 +16,7 @@
       "id": "o58a",
       "label": "Curated starter questions, surfaced in the skill",
       "chosen": true,
-      "note": "A fixed set of ~3–6 common decisions per SDLC phase. The skill offers them when you work a stage; answering one runs normal confirm-at-the-moment capture.",
+      "note": "A fixed set of ~3–6 common decisions per SDLC phase. Invoked by a dedicated subcommand for a stage; answering one runs normal confirm-at-the-moment capture (a decided decision). Coverage-aware: a starter drops off once that phase has a decision covering it.",
       "tradeoffs": [
         { "criterion": "fits the goal", "sentiment": "+", "note": "turns the log into a 'what to decide next' system, the original ask" },
         { "criterion": "stays capture-only", "sentiment": "+", "note": "questions are prompts; nothing is written until the user answers and confirms" },
